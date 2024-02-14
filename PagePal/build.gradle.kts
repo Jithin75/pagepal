@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.11.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
