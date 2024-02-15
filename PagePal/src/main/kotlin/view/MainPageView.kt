@@ -1,10 +1,11 @@
-package org.example.View
+package org.example.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.clickable
 import androidx.compose.material.*
 import androidx.compose.material.icons.*
 import androidx.compose.material.icons.filled.Menu
@@ -13,10 +14,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import org.example.model.BookModel
+import org.example.viewmodel.MainPageViewModel
 
 @Composable
-fun MainPageView() {
+fun MainPageView(mainPageViewModel: MainPageViewModel) {
     MaterialTheme {
         Scaffold(
             topBar = {
@@ -27,7 +34,7 @@ fun MainPageView() {
                             color = Color(0xFFFFFFFF),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(end = 48.dp),
+                                .padding(end = 56.dp),
                             textAlign = TextAlign.Center
                         )
                             },
@@ -76,8 +83,11 @@ fun MainPageView() {
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        items(20) { index ->
-                            BookItem(title = "Book $index", modifier = Modifier.padding(8.dp))
+                        items(mainPageViewModel.getUserLibrary().size) { index ->
+                            BookItem(
+                                mainPageViewModel.getUserLibrary()[index],
+                                onClick = {/* Add click functionality */}
+                            )
                         }
                     }
                 }
@@ -92,26 +102,50 @@ fun DropDownMenu(title: String, options: List<String>){
 }
 
 @Composable
-fun BookItem(title: String, modifier: Modifier = Modifier) {
+fun BookItem(book: BookModel, onClick: () -> Unit) {
     Box(
-        modifier = modifier
-            .size(120.dp)
-            .background(color = MaterialTheme.colors.secondary, shape = MaterialTheme.shapes.medium)
-            .clickable { /* Handle book item click */ }
-            .padding(8.dp),
-        contentAlignment = Alignment.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(onClick = onClick)
+            .padding(8.dp)
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .background(color = MaterialTheme.colors.surface, shape = MaterialTheme.shapes.medium),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(title)
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(title)
+        val painter = painterResource(book.cover)
+
+        Column (
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // cover
+            Image(
+                painter = painter,
+                contentDescription = book.title
+            )
+
+            // title
+            Text(
+                text = book.title,
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color(0xFFFFFFFF)
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            // author
+            Text(
+                text = book.author,
+                style = TextStyle(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp,
+                    color = Color(0xFFFFFFFF)
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
+
     }
 }

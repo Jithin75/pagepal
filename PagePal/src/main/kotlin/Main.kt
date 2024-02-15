@@ -12,14 +12,34 @@ import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import com.sun.tools.javac.Main
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import org.example.View.MainPageView
+import org.example.view.MainPageView
 import org.bson.BsonValue
+import org.example.model.BookModel
+import org.example.model.UserModel
+import org.example.viewmodel.MainPageViewModel
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() = application {
+    val library = mutableListOf(
+        BookModel("Les Miserables", "Victor Hugo", "lesMiserables.jpg"),
+        BookModel("La Bete humaine", "Guy de Maupassant", "laBeteHumaine.jpg"),
+        BookModel("Voyage au Centre de la Terre", "Jules Verne"),
+        BookModel("I, Robot", "Isaac Asimov", "IRobot.jpg"),
+        BookModel("Murder on the Orient Express", "Agatha Christie", "murderOrientExpress.jpg"),
+        BookModel("Le Rhin", "Victor Hugo"),
+        BookModel("La Metamorphose", "Franz Kafka", "laMetamorphose.jpg"),
+        BookModel("L'Etranger", "Albert Camus", "lEtranger.jpg"),
+        BookModel("L'Avare", "Moliere"),
+        BookModel("The Recruit", "Robert Muchamore", "theRecruit.jpg")
+    )
+
+    val user = UserModel("Achille59", "complicatedPassw0rd", library)
+    val mainPageViewModel = MainPageViewModel(user)
+
     Window(
         title = "PagePal",
         state = WindowState(
@@ -29,7 +49,7 @@ fun main() = application {
         resizable = false,
         onCloseRequest = ::exitApplication
     ) {
-        MainPageView()
+        MainPageView(mainPageViewModel)
     }
 
     /*
