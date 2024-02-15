@@ -5,22 +5,42 @@ import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
+import org.bson.BsonValue
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() {
     val database = getDatabase()
-    val collection = database.getCollection<UserInfo>(collectionName = "PagePalCollection")
+    val userCollection = database.getCollection<UserInfo>(collectionName = "UserCollection")
+    val bookCollection = database.getCollection<BookInfo>(collectionName = "BookCollection")
 
     runBlocking {
-        /*addUser(collection, "Smith",
-            listOf("Naruto", "One Punch Man", "Spider-man"),
-            listOf("Bob")
-        )
-        readUser(collection)*/
-        updateUserName(collection, "Ross", "Bill")
-        deleteUser(collection, "Smith")
+        // Add a book to the book collection
+        val bookId = addBook(bookCollection, "Percy Jackson Bk 1", "Rick Riordian")
+
+        // Add a user referencing the book ID
+        addUser(userCollection, "Bob", listOf(bookId), listOf())
+
+        // Read the user
+        readUser(userCollection, bookCollection)
+
+        // Update user's book list with another book
+        val newBookId = addBook(bookCollection, "One Punch Man", "ONE")
+        updateUserBookList(userCollection, "Bob", newBookId)
+
+        // Read the updated user
+        readUser(userCollection, bookCollection)
+
+        // Remove a book from a user's collection
+        removeBookFromUser(userCollection, "Bob", newBookId)
+
+        // Read the updated user
+        readUser(userCollection, bookCollection)
+
+        // Delete the user
+        deleteUser(userCollection, "Bob")
     }
 }
 
@@ -31,10 +51,26 @@ fun getDatabase() : MongoDatabase{
 
 data class UserInfo(
     val userName: String,
-    val bookList: List<String>,
+    val bookList: List<BsonValue>,
     val friendList: List<String>
 )
-suspend fun addUser(collection: MongoCollection<UserInfo>, userName: String, bookList: List<String>, friendList: List<String>){
+
+data class BookInfo(
+    val title: String,
+    val author: String
+)
+
+suspend fun addBook(collection: MongoCollection<BookInfo>, title: String, author: String): BsonValue {
+    val book = BookInfo(title, author)
+    var bookId: BsonValue
+    collection.insertOne(book).also {
+        println("Inserted Book - ${it.insertedId}")
+        bookId = it.insertedId
+    }
+    return bookId
+}
+
+suspend fun addUser(collection: MongoCollection<UserInfo>, userName: String, bookList: List<BsonValue>, friendList: List<String>){
     val info = UserInfo(
         userName = userName,
         bookList = bookList,
@@ -46,17 +82,22 @@ suspend fun addUser(collection: MongoCollection<UserInfo>, userName: String, boo
     }
 }
 
-suspend fun readUser(collection: MongoCollection<UserInfo>) {
-    val query = Filters.or(
-        listOf(
-            Filters.eq("userName", "Bob"),
-            Filters.eq(UserInfo::userName.name, "Jack")
+suspend fun readUser(userCollection: MongoCollection<UserInfo>, bookCollection: MongoCollection<BookInfo>) {
+    userCollection.find<UserInfo>().collect { user ->
+        println("${user.userName}'s Book List:")
+        user.bookList.forEach { bookId ->
+            val book = bookCollection.find(Filters.eq("_id", bookId)).firstOrNull()
+            println("${book?.title} by ${book?.author}")
+        }
+    }
+}
 
-        )
-    )
+suspend fun updateUserBookList(collection: MongoCollection<UserInfo>, userName: String, newBookId: BsonValue) {
+    val query = Filters.eq(UserInfo::userName.name, userName)
+    val updateSet = Updates.addToSet(UserInfo::bookList.name, newBookId)
 
-    collection.find<UserInfo>(filter = query).limit(2).collect {
-        println(it)
+    collection.updateOne(filter = query, update = updateSet).also {
+        println("Matched docs ${it.matchedCount} and updated docs ${it.modifiedCount}")
     }
 }
 
@@ -66,6 +107,15 @@ suspend fun updateUserName(collection: MongoCollection<UserInfo>, curUserName: S
 
     // can change to updateOne if only want to update first occurance
     collection.updateMany(filter = query, update = updateSet).also {
+        println("Matched docs ${it.matchedCount} and updated docs ${it.modifiedCount}")
+    }
+}
+
+suspend fun removeBookFromUser(collection: MongoCollection<UserInfo>, userName: String, bookIdToRemove: BsonValue) {
+    val query = Filters.eq(UserInfo::userName.name, userName)
+    val updateSet = Updates.pull(UserInfo::bookList.name, bookIdToRemove)
+
+    collection.updateOne(filter = query, update = updateSet).also {
         println("Matched docs ${it.matchedCount} and updated docs ${it.modifiedCount}")
     }
 }
