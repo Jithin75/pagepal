@@ -1,15 +1,36 @@
 package org.example
 
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.application
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.runBlocking
+import org.example.View.MainPageView
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-fun main() {
+fun main() = application {
+    Window(
+        title = "PagePal",
+        state = WindowState(
+            position = WindowPosition(Alignment.Center),
+            size = DpSize(1024.dp, 576.dp)
+        ),
+        resizable = false,
+        onCloseRequest = ::exitApplication
+    ) {
+        MainPageView()
+    }
+
+    /*
     val database = getDatabase()
     val collection = database.getCollection<UserInfo>(collectionName = "PagePalCollection")
 
@@ -21,7 +42,7 @@ fun main() {
         readUser(collection)*/
         updateUserName(collection, "Ross", "Bill")
         deleteUser(collection, "Smith")
-    }
+    }*/
 }
 
 fun getDatabase() : MongoDatabase{
