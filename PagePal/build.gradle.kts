@@ -19,7 +19,7 @@ dependencies {
     // compose.desktop.currentOs should be used in launcher-sourceSet
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
-    implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.11.0")
+    //implementation("org.mongodb:mongodb-driver-kotlin-coroutine:4.11.0")
     implementation(compose.desktop.currentOs)
     testImplementation(kotlin("test"))
 }
@@ -29,9 +29,11 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "team-102-5"
             packageVersion = "1.0.0"
+
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
         }
     }
 }

@@ -1,5 +1,3 @@
-package org.example
-
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -7,16 +5,19 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+/*
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import com.sun.tools.javac.Main
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
+
+ */
+//import kotlinx.coroutines.flow.firstOrNull
+//import kotlinx.coroutines.runBlocking
 import org.example.view.MainPageView
-import org.bson.BsonValue
+//import org.bson.BsonValue
 import org.example.model.BookModel
 import org.example.model.UserModel
 import org.example.viewmodel.MainPageViewModel
@@ -87,7 +88,7 @@ fun main() = application {
      */
 }
 
-
+/*
 fun getDatabase() : MongoDatabase{
     val client = MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
     return client.getDatabase(databaseName = "PagePalDB")
@@ -171,3 +172,5 @@ suspend fun deleteUser(collection: MongoCollection<UserInfo>, userName: String) 
     }
 }
 
+
+ */
