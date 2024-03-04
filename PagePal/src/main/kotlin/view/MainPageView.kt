@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
+import view.HamburgerMenuView
 
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel) {
@@ -40,7 +41,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                             },
                     backgroundColor = Color(0xFF404040),
                     navigationIcon = {
-                        IconButton(onClick = { /* Handle hamburger button click */ }) {
+                        IconButton(onClick = {mainPageViewModel.onHamburgerClick()}) {
                             Icon(Icons.Filled.Menu, contentDescription = "Menu")
                         }
                     }
@@ -91,9 +92,17 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                         }
                     }
                 }
+                if (mainPageViewModel.isHamburgerOpen) {
+                    HamburgerMenuView(mainPageViewModel)
+                }
             }
         )
     }
+}
+
+@Composable
+fun HamburgerMenu(){
+
 }
 
 @Composable
