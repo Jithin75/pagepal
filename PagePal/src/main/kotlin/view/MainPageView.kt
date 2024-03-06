@@ -1,17 +1,19 @@
 package org.example.view
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.*
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
+import theme.*
 import view.HamburgerMenuView
 
 @Composable
@@ -35,14 +38,17 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                             color = Color(0xFFFFFFFF),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(end = 56.dp),
+                                .padding(end = 68.dp),
                             textAlign = TextAlign.Center
                         )
                             },
-                    backgroundColor = Color(0xFF404040),
+                    backgroundColor = grey,
                     navigationIcon = {
                         IconButton(onClick = {mainPageViewModel.onHamburgerClick()}) {
-                            Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                            Icon(Icons.Filled.Menu,
+                                contentDescription = "Menu",
+                                tint = lightbrown
+                            )
                         }
                     }
                 )
@@ -51,25 +57,49 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(color = Color(0xFF293040))
+                        .background(color = darkblue)
                         .padding(10.dp)
                 ) {
-                    // Search Bar and Filters
-                    Box(
+                    // Search Bar, Filters and Add Button
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(96.dp)
-                            .background(color = Color(0xFF293040))
-                            .padding(10.dp)
+                            .height(64.dp)
+                            .background(color = darkblue)
+                            .align(Alignment.CenterHorizontally)
+                            .padding(horizontal = 8.dp)
                     ) {
                         // Replace these with actual search and filter components
-
-                        Text("Search Bar", Modifier.align(Alignment.CenterStart))
-                        Text("Genre, Status, Sort", Modifier.align(Alignment.Center))
+                        SearchBar(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        DropDown(
+                            listOf("Genre", "Horror", "Fantasy", "SciFi"),
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        DropDown(
+                            listOf("Status", "Read", "In Progress", "New"),
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        DropDown(
+                            listOf("Sort", "Alphabetical", "Most Recent"),
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically)
+                        )
                         Button(
                             onClick = { /* Handle add button click */ },
-                            Modifier.align(Alignment.CenterEnd),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF5FD855))
+                            Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically)
+                                .size(64.dp,32.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = green)
                         ) {
                             Text("Add")
                         }
@@ -101,13 +131,72 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
 }
 
 @Composable
-fun HamburgerMenu(){
-
+fun SearchBar(modifier: Modifier){
+    var searchContent by remember {mutableStateOf("")}
+    TextField(
+        value = searchContent,
+        onValueChange = {searchContent = it},
+        leadingIcon = { Icon(
+            Icons.Filled.Search,
+            contentDescription = "searchIcon",
+        )},
+        placeholder = {Text("Search")},
+        modifier = modifier
+            .width(256.dp)
+            .height(50.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = whitevariation,
+            leadingIconColor = Color.Black,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            placeholderColor = lightgrey,
+            cursorColor = Color.Black,
+        )
+    )
 }
 
 @Composable
-fun DropDownMenu(title: String, options: List<String>){
+fun DropDown(options: List<String>, modifier: Modifier){
     var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(options[0])}
+
+    Box(
+        contentAlignment = Alignment.CenterStart,
+        modifier = modifier
+            .size(187.dp, 50.dp)
+            .clip(RoundedCornerShape(1.dp))
+            .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
+            .clickable { expanded = !expanded },
+    ) {
+        Text(
+            text = selectedOptionText,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(start = 10.dp),
+            color = lightgrey
+        )
+        Icon(
+            Icons.Filled.ArrowDropDown,
+            "contentDescription",
+            Modifier.align(Alignment.CenterEnd),
+            tint = lightgrey
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedOptionText = selectionOption
+                        expanded = false
+                    }
+                ) {
+                    Text(text = selectionOption)
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -137,7 +226,7 @@ fun BookItem(book: BookModel, onClick: () -> Unit) {
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = Color(0xFFFFFFFF)
+                    color = Color.White
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 8.dp)
