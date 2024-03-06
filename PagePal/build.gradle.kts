@@ -17,6 +17,7 @@ repositories {
 dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("org.json:json:20231013")
+    implementation("com.google.code.gson:gson:2.8.8")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     // Note, if you develop a library, you should use compose.desktop.common.
     // compose.desktop.currentOs should be used in launcher-sourceSet
