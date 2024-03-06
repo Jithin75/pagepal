@@ -21,6 +21,7 @@ import org.example.view.MainPageView
 import org.example.model.BookModel
 import org.example.model.UserModel
 import org.example.viewmodel.MainPageViewModel
+import java.awt.Dimension
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -47,9 +48,10 @@ fun main() = application {
             position = WindowPosition(Alignment.Center),
             size = DpSize(1024.dp, 576.dp)
         ),
-        resizable = false,
+        resizable = true,
         onCloseRequest = ::exitApplication
     ) {
+        window.minimumSize = Dimension(1280, 720)
         MainPageView(mainPageViewModel)
     }
 

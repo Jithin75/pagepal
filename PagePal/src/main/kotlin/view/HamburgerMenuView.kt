@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import org.example.viewmodel.MainPageViewModel
+import theme.grey
 
 @Composable
 fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
@@ -24,7 +25,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(360.dp)
-                    .background(color = Color(0xFF404040))
+                    .background(color = grey)
                     .padding(32.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
