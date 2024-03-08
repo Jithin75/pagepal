@@ -6,4 +6,4 @@ The project proposal for this application can be found in the [Wiki page](../../
 
 ### Release Notes:
 
-release-notes Sprint 1: [Sprint1](../../wikis/release-notes-Sprint-1)
+[Release Notes](../../wikis/Release-Notes)
