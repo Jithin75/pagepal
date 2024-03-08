@@ -11,12 +11,28 @@ class MainPageViewModel (val userModel: UserModel){
     var isHamburgerOpen by mutableStateOf(false)
         private set
 
+    var isBookOpen by mutableStateOf(false)
+        private set
+
+    var bookOpened by mutableStateOf<BookModel?>(null)
+        private set
+
+    fun onBookClick(bookModel: BookModel) {
+        isBookOpen = true
+        bookOpened = bookModel
+    }
+
+    fun onDismissBook() {
+        isBookOpen = false
+        bookOpened = null
+    }
+
     fun onHamburgerClick() {
-        isHamburgerOpen = true;
+        isHamburgerOpen = true
     }
 
     fun onDismissHamburger() {
-        isHamburgerOpen = false;
+        isHamburgerOpen = false
     }
 
     fun getUserLibrary(): List<BookModel> {

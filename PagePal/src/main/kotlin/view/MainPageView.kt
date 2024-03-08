@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
 import theme.*
+import view.BookView
 import view.HamburgerMenuView
 
 @Composable
@@ -35,7 +36,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                     title = {
                         Text(
                             text = "PagePal",
-                            color = Color(0xFFFFFFFF),
+                            color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(end = 68.dp),
@@ -67,9 +68,9 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                             .height(64.dp)
                             .background(color = darkblue)
                             .align(Alignment.CenterHorizontally)
-                            .padding(horizontal = 8.dp)
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        // Replace these with actual search and filter components
                         SearchBar(
                             modifier = Modifier
                                 .padding(horizontal = 8.dp)
@@ -117,7 +118,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                         items(mainPageViewModel.getUserLibrary().size) { index ->
                             BookItem(
                                 mainPageViewModel.getUserLibrary()[index],
-                                onClick = {/* Add click functionality */}
+                                onClick = {mainPageViewModel.onBookClick(mainPageViewModel.getUserLibrary()[index])}
                             )
                         }
                     }
@@ -125,8 +126,13 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                 if (mainPageViewModel.isHamburgerOpen) {
                     HamburgerMenuView(mainPageViewModel)
                 }
+
             }
         )
+        if(mainPageViewModel.isBookOpen) {
+            val bookModel = mainPageViewModel.bookOpened ?: BookModel(title = "error")
+            BookView(mainPageViewModel, bookModel)
+        }
     }
 }
 
@@ -142,7 +148,7 @@ fun SearchBar(modifier: Modifier){
         )},
         placeholder = {Text("Search")},
         modifier = modifier
-            .width(256.dp)
+            .width(320.dp)
             .height(50.dp),
         shape = RoundedCornerShape(16.dp),
         colors = TextFieldDefaults.textFieldColors(
@@ -164,7 +170,7 @@ fun DropDown(options: List<String>, modifier: Modifier){
     Box(
         contentAlignment = Alignment.CenterStart,
         modifier = modifier
-            .size(187.dp, 50.dp)
+            .size(192.dp, 50.dp)
             .clip(RoundedCornerShape(1.dp))
             .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
             .clickable { expanded = !expanded },
