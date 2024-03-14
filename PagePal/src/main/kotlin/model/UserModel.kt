@@ -1,10 +1,9 @@
 package org.example.model
 
-class UserModel (val username: String,
-                 val password: String,
-                 val library: MutableList<BookModel> = mutableListOf())
-{
-    fun addBook(book: BookModel) {
-        library.add(book);
-    }
-}
+import org.bson.BsonValue
+
+class UserModel(
+    var username: String = "",
+    var password: String = "",
+    var library: MutableList<BsonValue> = mutableListOf()
+)
