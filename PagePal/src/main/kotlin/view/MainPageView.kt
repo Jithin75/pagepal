@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
@@ -14,12 +14,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
@@ -29,6 +29,8 @@ import view.HamburgerMenuView
 
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel) {
+    val coroutineScope = rememberCoroutineScope()
+
     MaterialTheme {
         Scaffold(
             topBar = {
@@ -115,12 +117,15 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        items(mainPageViewModel.getUserLibrary().size) { index ->
-                            BookItem(
-                                mainPageViewModel.getUserLibrary()[index],
-                                onClick = {mainPageViewModel.onBookClick(mainPageViewModel.getUserLibrary()[index])}
-                            )
-                        }
+                        //coroutineScope.launch {
+                            val library = mainPageViewModel.getUserLibrary()
+                            items(library.size) { index ->
+                                BookItem(
+                                    library[index],
+                                    onClick = { mainPageViewModel.onBookClick(library[index]) }
+                                )
+                            }
+                        //}
                     }
                 }
                 if (mainPageViewModel.isHamburgerOpen) {
