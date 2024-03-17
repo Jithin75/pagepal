@@ -1,5 +1,8 @@
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -24,6 +27,7 @@ import view.LoginView
 import view.SignupView
 import java.awt.Dimension
 
+data class LoginViewState(val login: UserModel?, val view: String)
 
 @Composable
 fun App(currentView: MutableState<String>) {
@@ -62,16 +66,20 @@ fun App(currentView: MutableState<String>) {
     val user = UserModel("Achille59", "complicatedPassw0rd", library )
 
     val mainPageViewModel = MainPageViewModel(user, bookLibrary)
-    val (view, setView) = remember { mutableStateOf("login") }
-    val (loginID, setLogin) = remember { mutableIntStateOf(0) }
-    if (view == "login") {
-        LoginView(setView, setLogin)
-    } else if (view == "signup") {
-        SignupView(setView)
-    } else if (view == "main") {
+    val (currentState, setCurrentState) = remember { mutableStateOf(LoginViewState(null, "login")) }
+    if (currentState.view == "login") {
+        LoginView(setCurrentState)
+    } else if (currentState.view == "signup") {
+        SignupView(setCurrentState)
+    } else if (currentState.view == "main") {
         // Get user using loginID to get mainPageViewModel
         //MainPageView(mainPageViewModel)
-        MainPageView(mainPageViewModel)
+        if(currentState.login == null) {
+            MainPageView(mainPageViewModel)
+        } else {
+            val newBookLibrary : MutableList<BookModel> = mutableListOf()
+            MainPageView(MainPageViewModel(currentState.login, newBookLibrary))
+        }
     }
 }
 
