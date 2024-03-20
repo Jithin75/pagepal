@@ -53,7 +53,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clickable(onClick = {/* add Profile functionality */})
+                        .clickable(onClick = {mainPageViewModel.toggleProfilePage()})
                         .fillMaxWidth()
                         .height(48.dp)
 
@@ -73,7 +73,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clickable(onClick = {/* add Settings functionality */})
+                        .clickable(onClick = {})
                         .fillMaxWidth()
                         .height(48.dp)
 
@@ -93,7 +93,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clickable(onClick = {/* add Friends functionality */})
+                        .clickable(onClick = {/* add Profile functionality */})
                         .fillMaxWidth()
                         .height(48.dp)
 
@@ -139,6 +139,9 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                 ) {
                     Text("SIGN OUT")
                 }
+            }
+            if (mainPageViewModel.isProfileOpen) {
+                ProfilePageView(mainPageViewModel)
             }
         }
     )
