@@ -47,16 +47,15 @@ fun App(currentView: MutableState<String>) {
     */
     var library: MutableList<BsonValue> = mutableListOf()
     var bookLibrary : MutableList<BookModel> = mutableListOf()
+    val pojoCodecRegistry: CodecRegistry = fromRegistries(
+        MongoClientSettings.getDefaultCodecRegistry(),
+        fromProviders(PojoCodecProvider.builder().automatic(true).build())
+    )
+
+    val client = MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
+    val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry);
+    val dbManager = DatabaseManager(database)
     runBlocking {
-        val pojoCodecRegistry: CodecRegistry = fromRegistries(
-            MongoClientSettings.getDefaultCodecRegistry(),
-            fromProviders(PojoCodecProvider.builder().automatic(true).build())
-        )
-
-        val client = MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
-        val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry);
-        val dbManager = DatabaseManager(database)
-
         // Temporary, will be removed once the login authorization is fully functional
         val book = BookModel("Les Miserables", "Victor Hugo", "lesMiserables.jpg")
         val bookid = dbManager.addBook(book)
@@ -65,7 +64,7 @@ fun App(currentView: MutableState<String>) {
     }
     val user = UserModel("Achille59", "complicatedPassw0rd", library )
 
-    val mainPageViewModel = MainPageViewModel(user, bookLibrary)
+    val mainPageViewModel = MainPageViewModel(user, bookLibrary, dbManager)
     val (currentState, setCurrentState) = remember { mutableStateOf(LoginViewState(null, "login")) }
     if (currentState.view == "login") {
         LoginView(setCurrentState)
@@ -78,7 +77,7 @@ fun App(currentView: MutableState<String>) {
             MainPageView(mainPageViewModel)
         } else {
             val newBookLibrary : MutableList<BookModel> = mutableListOf()
-            MainPageView(MainPageViewModel(currentState.login, newBookLibrary))
+            MainPageView(MainPageViewModel(currentState.login, newBookLibrary, dbManager))
         }
     }
 }
