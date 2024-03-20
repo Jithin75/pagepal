@@ -24,6 +24,8 @@ class DatabaseManager(private val database: MongoDatabase) {
     }
 
     suspend fun addUser(user: UserModel) {
+        user.password = PasswordEncryption.hashPassword(user.password)
+
         val result = userCollection.insertOne(user)
         println("Inserted User - ${result.insertedId}")
     }
@@ -83,8 +85,9 @@ class DatabaseManager(private val database: MongoDatabase) {
             println("Invalid credentials")
             return false
         }
+        val hashedNewPassword = PasswordEncryption.hashPassword(newPassword)
         val filter = Filters.eq(UserModel::username.name, username)
-        val update = Updates.set(UserModel::password.name, newPassword)
+        val update = Updates.set(UserModel::password.name, hashedNewPassword)
         val result = userCollection.updateOne(filter, update)
         println("Updated ${result.modifiedCount} document(s)")
         return true
@@ -93,27 +96,24 @@ class DatabaseManager(private val database: MongoDatabase) {
     suspend fun isValidCredentials(username: String, password: String): Boolean {
         val filter = Filters.eq(UserModel::username.name, username)
         val user : UserModel? = userCollection.find(filter).limit(1).firstOrNull()
-        return user?.password == password
+        return user != null && PasswordEncryption.verifyPassword(password, user.password)
     }
 
     suspend fun getBookById(bookId: BsonValue): BookModel? {
         return bookCollection.find(Filters.eq("_id", bookId)).firstOrNull()
     }
 
-    /*
-    suspend fun addBooksToUser(username: String, bookIds: List<BsonValue>) {
-        val user = getUserByUsername(username)
-        if (user != null) {
-            user.library.addAll(bookIds)
-            updateUserLibrary(username, user.library)
+    suspend fun getUserLibraryDB(user: UserModel): MutableList<BookModel> {
+        val library = mutableListOf<BookModel>()
+        for (bookId in user.library) {
+            val book = getBookById(bookId)
+            if (book != null) {
+                library.add(book)
+            } else {
+                println("Book with ID $bookId not found.")
+            }
         }
-    }*/
-
-    private suspend fun updateUserLibrary(username: String, updatedLibrary: MutableList<BsonValue>) {
-        val filter: Bson = Filters.eq(UserModel::username.name, username)
-        val update = Updates.set(UserModel::library.name, updatedLibrary)
-        val result = userCollection.updateOne(filter, update)
-        println("Matched docs ${result.matchedCount} and updated docs ${result.modifiedCount}")
+        return library
     }
 
     suspend fun clearBookCollection() {

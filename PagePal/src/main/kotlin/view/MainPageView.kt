@@ -29,8 +29,6 @@ import view.HamburgerMenuView
 
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel) {
-    val coroutineScope = rememberCoroutineScope()
-
     MaterialTheme {
         Scaffold(
             topBar = {
@@ -117,15 +115,13 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        //coroutineScope.launch {
-                            val library = mainPageViewModel.getUserLibrary()
-                            items(library.size) { index ->
-                                BookItem(
-                                    library[index],
-                                    onClick = { mainPageViewModel.onBookClick(library[index]) }
-                                )
-                            }
-                        //}
+                        val library = mainPageViewModel.getUserLibrary()
+                        items(library.size) { index ->
+                            BookItem(
+                                library[index],
+                                onClick = { mainPageViewModel.onBookClick(library[index]) }
+                            )
+                        }
                     }
                 }
                 if (mainPageViewModel.isHamburgerOpen) {
