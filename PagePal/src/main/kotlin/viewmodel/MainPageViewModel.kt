@@ -16,6 +16,13 @@ class MainPageViewModel (val userModel: UserModel, val bookLibrary : MutableList
     var bookOpened by mutableStateOf<BookModel?>(null)
         private set
 
+    var isProfileOpen by mutableStateOf(false)
+        private set
+
+    fun toggleProfilePage() {
+        isProfileOpen = !isProfileOpen
+    }
+
     fun onBookClick(bookModel: BookModel) {
         isBookOpen = true
         bookOpened = bookModel
