@@ -3,10 +3,23 @@ package org.example.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
+import com.mongodb.MongoClientSettings
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import kotlinx.coroutines.runBlocking
+import org.bson.codecs.configuration.CodecRegistries
+import org.bson.codecs.configuration.CodecRegistry
+import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.BookModel
+import org.example.model.DatabaseManager
 import org.example.model.UserModel
 
-class MainPageViewModel (val userModel: UserModel, val bookLibrary : MutableList<BookModel>){
+class MainPageViewModel (val userModel: UserModel,
+                         val bookLibrary : MutableList<BookModel>,
+                         val dbManager: DatabaseManager){
+    var displayedBooks by mutableStateOf(bookLibrary.toMutableList())
+        private set
+
     var isHamburgerOpen by mutableStateOf(false)
         private set
 
@@ -14,6 +27,9 @@ class MainPageViewModel (val userModel: UserModel, val bookLibrary : MutableList
         private set
 
     var bookOpened by mutableStateOf<BookModel?>(null)
+        private set
+
+    var isAddBookOpen by mutableStateOf(false)
         private set
 
     fun onBookClick(bookModel: BookModel) {
@@ -34,6 +50,14 @@ class MainPageViewModel (val userModel: UserModel, val bookLibrary : MutableList
         isHamburgerOpen = false
     }
 
+    fun onAddBookClick() {
+        isAddBookOpen = true
+    }
+
+    fun onDismissAddBook() {
+        isAddBookOpen = false
+    }
+
     fun getUserLibrary(): List<BookModel> {
         /*val library = mutableListOf<BookModel>()
 
@@ -52,5 +76,14 @@ class MainPageViewModel (val userModel: UserModel, val bookLibrary : MutableList
         }*/
 
         return bookLibrary
+    }
+
+    fun addBook(book: BookModel) {
+        runBlocking {
+            val bookId = dbManager.addBook(book)
+            userModel.addBook(bookId)
+        }
+        bookLibrary.add(book)
+        displayedBooks.add(book)
     }
 }

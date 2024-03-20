@@ -11,7 +11,7 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
     private val gson = Gson()
     private val apiKey = "AIzaSyBBXlEGsv7EiNaJkfrco-wfFj6KFaIVDlY"
 
-    fun searchBooks(query: String): List<Book>? {
+    fun searchBooks(query: String): List<Book> {
         val formatQuery = query.replace(" ", "+")
         val url = "$baseUrl?q=${formatQuery}&key=${apiKey}"
         val request = Request.Builder()
@@ -19,12 +19,18 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
             .build()
 
         val jsonString = executeRequest(request)
-        return jsonString?.let { parseBooks(it) }
+        if (jsonString == null) {
+            return emptyList()
+        }
+        return parseBooks(jsonString)
     }
 
     private fun parseBooks(jsonString: String): List<Book> {
         val jsonObject = gson.fromJson(jsonString, JsonObject::class.java)
         val itemsArray = jsonObject.getAsJsonArray("items")
+        if (itemsArray == null) {
+            return emptyList()
+        }
         val items = if (itemsArray.size() >= 10) {
             itemsArray.take(10)
         } else {
@@ -36,20 +42,20 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
             val itemInfo = item.asJsonObject.get("volumeInfo")
             val title = itemInfo.asJsonObject.get("title")?.asString ?: ""
             val authors = itemInfo.asJsonObject.get("authors")?.asJsonArray
-                ?.joinToString(", ") { it.asString } ?: ""
-            val publisher = itemInfo.asJsonObject.get("publisher")?.asString ?: ""
-            val publishDate = itemInfo.asJsonObject.get("publishedDate")?.asString ?: ""
+                ?.joinToString(", ") { it.asString } ?: "unspecified Authors"
+            val publisher = itemInfo.asJsonObject.get("publisher")?.asString ?: "Publisher not available"
+            val publishDate = itemInfo.asJsonObject.get("publishedDate")?.asString ?: "Publish Year not available"
             val publishYear = publishDate.take(4)
-            val description = itemInfo.asJsonObject.get("description")?.asString ?: ""
+            val description = itemInfo.asJsonObject.get("description")?.asString ?: "Description not available"
             val categories = itemInfo.asJsonObject.get("categories")?.asJsonArray
-                ?.joinToString(", ") { it.asString } ?: ""
+                ?.joinToString(", ") { it.asString } ?: "Categories not available"
             val imgLinks =  itemInfo.asJsonObject.get("imageLinks")?.asJsonObject
             val img = if (imgLinks != null) {
-                imgLinks.get("thumbnail")?.asString
+                imgLinks.get("thumbnail")?.asString ?: "coverNotAvailable.png"
             } else {
-                ""
+                "coverNotAvailable.png"
             }
-            books.add(Book(title, authors, publisher, publishYear, description, categories, img))
+            books.add(Book(title, authors, img, publisher, publishYear, description, categories))
         }
         return books
     }
@@ -65,12 +71,12 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
     }
 }
 
-data class Book(val title: String?, val authors: String?, val publisher: String?, val publishYear: String?,
-                val description: String?, val categories: String?, val img: String?)
+data class Book(val title: String, val authors: String, val img: String, val publisher: String, val publishYear: String,
+                val description: String, val categories: String)
 
 fun main() {
     val bookApiClient = BookApiClient()
-    val query = "blue lock"
+    val query = ""
     val bookResults = bookApiClient.searchBooks(query)
     println("Search Result for '$query':")
     bookResults?.forEachIndexed { index, book ->
