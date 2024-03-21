@@ -6,10 +6,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import okhttp3.Response
 
-import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
-
 class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/books/v1/volumes") {
     private val client = OkHttpClient()
     private val gson = Gson()

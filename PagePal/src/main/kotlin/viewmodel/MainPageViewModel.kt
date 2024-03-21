@@ -1,23 +1,10 @@
 package org.example.viewmodel
 
 import androidx.compose.runtime.*
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
 import kotlinx.coroutines.runBlocking
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.BookModel
 import org.example.model.DatabaseManager
 import org.example.model.UserModel
-import org.example.view.SearchBar
-import java.io.File
-import java.io.FileOutputStream
-import javax.imageio.ImageIO
-import java.net.URL
-import java.nio.channels.Channels
-import java.awt.Image
-import java.awt.image.BufferedImage
 
 
 class MainPageViewModel (val userModel: UserModel,
