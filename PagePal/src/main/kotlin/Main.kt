@@ -64,7 +64,7 @@ fun App(currentView: MutableState<String>) {
     }
     val user = UserModel("Achille59", "complicatedPassw0rd", library )
 
-    val mainPageViewModel = MainPageViewModel(user, bookLibrary, dbManager)
+    val mainPageViewModel = remember { MainPageViewModel(user, bookLibrary, dbManager) }
     val (currentState, setCurrentState) = remember { mutableStateOf(LoginViewState(null, "login")) }
     if (currentState.view == "login") {
         LoginView(setCurrentState)
