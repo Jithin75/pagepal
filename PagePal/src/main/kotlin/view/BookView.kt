@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
+import model.ImageLoader
 import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
 import theme.*
@@ -33,6 +35,7 @@ import viewmodel.BookViewModel
 
 @Composable
 fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel){
+    val imageLoader = ImageLoader()
     MaterialTheme{
         Scaffold (
             topBar = {
@@ -72,13 +75,22 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        val painter = painterResource(bookViewModel.getCover())
                         //cover
-                        Image(
-                            painter = painter,
-                            contentDescription = bookViewModel.getTitle(),
-                            modifier = Modifier.size(500.dp)
-                        )
+                        if (bookViewModel.getCover() == "coverNotAvailable.png") {
+                            val painter = painterResource(bookViewModel.getCover())
+                            Image(
+                                painter = painter,
+                                contentDescription = bookViewModel.getTitle(),
+                                modifier = Modifier.size(500.dp, 500.dp)
+                            )
+                        } else {
+                            imageLoader.AsyncImage(
+                                load = { imageLoader.loadImageBitmap(bookViewModel.getCover()) },
+                                painterFor = { remember { BitmapPainter(it) } },
+                                contentDescription = bookViewModel.getTitle(),
+                                modifier = Modifier.size(500.dp, 500.dp)
+                            )
+                        }
 
                         //title
                         Text(

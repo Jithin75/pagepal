@@ -39,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import model.ImageLoader
+import viewmodel.BookViewModel
 
 
 @Composable
@@ -421,6 +422,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                             // Handle selection of search result here
                             // For example, close popup and show details in a new window
                             selectedBook.value = result
+                            searchQuery.value = result.title
                             bookResults.value = emptyList()
                         })
                     }
