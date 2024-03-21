@@ -10,4 +10,4 @@ data class BookModel (
     val publishYear: String = "Publish Year not available",
     val description: String = "Description not available",
     val categories: String = "Categories not available",
-/*    val status: String = "Ongoing"*/)
+    val status: String = "Ongoing")

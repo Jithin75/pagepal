@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
 import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
 import theme.*
@@ -34,6 +36,15 @@ import model.api.*
 
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel) {
+    val sortOptions =  listOf("Sort", "Title", "Author", "Recently Added")
+    val statusOptions = listOf("Status", "Complete", "Ongoing", "Dropped")
+
+    var sortExpanded by remember { mutableStateOf(false) }
+    var sortSelectedOptionText by remember { mutableStateOf(sortOptions[0])}
+
+    var statusExpanded by remember { mutableStateOf(false) }
+    var statusSelectedOptionText by remember { mutableStateOf(statusOptions[0])}
+
     MaterialTheme {
         Scaffold(
             topBar = {
@@ -79,7 +90,8 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                         SearchBar(
                             modifier = Modifier
                                 .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterVertically)
+                                .align(Alignment.CenterVertically),
+                            mainPageViewModel
                         )
                         DropDown(
                             listOf("Genre", "Horror", "Fantasy", "SciFi"),
@@ -87,18 +99,84 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                                 .padding(horizontal = 8.dp)
                                 .align(Alignment.CenterVertically)
                         ) {}
-                        DropDown(
-                            listOf("Status", "Complete", "On Going", "Dropped"),
-                            Modifier
+                        Box(
+                            contentAlignment = Alignment.CenterStart,
+                            modifier = Modifier
                                 .padding(horizontal = 8.dp)
                                 .align(Alignment.CenterVertically)
-                        ) {}
-                        DropDown(
-                            listOf("Sort", "Alphabetical", "Most Recent"),
-                            Modifier
+                                .size(192.dp, 50.dp)
+                                .clip(RoundedCornerShape(1.dp))
+                                .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
+                                .clickable { statusExpanded = !statusExpanded },
+                        ) {
+                            Text(
+                                text = statusSelectedOptionText,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(start = 10.dp),
+                                color = lightgrey
+                            )
+                            Icon(
+                                Icons.Filled.ArrowDropDown,
+                                "contentDescription",
+                                Modifier.align(Alignment.CenterEnd),
+                                tint = lightgrey
+                            )
+                            DropdownMenu(
+                                expanded = statusExpanded,
+                                onDismissRequest = { statusExpanded = false }
+                            ) {
+                                statusOptions.forEach { selectionOption ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            statusSelectedOptionText = selectionOption
+                                            mainPageViewModel.statusFilter(selectionOption)
+                                            statusExpanded = false
+                                        }
+                                    ) {
+                                        Text(text = selectionOption)
+                                    }
+                                }
+                            }
+                        }
+                        Box(
+                            contentAlignment = Alignment.CenterStart,
+                            modifier = Modifier
                                 .padding(horizontal = 8.dp)
                                 .align(Alignment.CenterVertically)
-                        ) {}
+                                .size(192.dp, 50.dp)
+                                .clip(RoundedCornerShape(1.dp))
+                                .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
+                                .clickable { sortExpanded = !sortExpanded },
+                        ) {
+                            Text(
+                                text = sortSelectedOptionText,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(start = 10.dp),
+                                color = lightgrey
+                            )
+                            Icon(
+                                Icons.Filled.ArrowDropDown,
+                                "contentDescription",
+                                Modifier.align(Alignment.CenterEnd),
+                                tint = lightgrey
+                            )
+                            DropdownMenu(
+                                expanded = sortExpanded,
+                                onDismissRequest = { sortExpanded = false }
+                            ) {
+                                sortOptions.forEach { selectionOption ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            sortSelectedOptionText = selectionOption
+                                            mainPageViewModel.sortFilter(selectionOption)
+                                            sortExpanded = false
+                                        }
+                                    ) {
+                                        Text(text = selectionOption)
+                                    }
+                                }
+                            }
+                        }
                         Button(
                             onClick = { mainPageViewModel.onAddBookClick() },
                             Modifier
@@ -120,7 +198,8 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        val library = mainPageViewModel.getUserLibrary()
+                        var displayedBooks = mainPageViewModel.getUserLibrary()
+                        val library = displayedBooks.value
                         items(library.size) { index ->
                             BookItem(
                                 library[index],
@@ -147,11 +226,13 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
 }
 
 @Composable
-fun SearchBar(modifier: Modifier){
+fun SearchBar(modifier: Modifier, mainPageViewModel: MainPageViewModel){
     var searchContent by remember {mutableStateOf("")}
     TextField(
         value = searchContent,
-        onValueChange = {searchContent = it},
+        onValueChange = {
+            searchContent = it
+            mainPageViewModel.searchResults(it)},
         leadingIcon = { Icon(
             Icons.Filled.Search,
             contentDescription = "searchIcon",
@@ -173,7 +254,7 @@ fun SearchBar(modifier: Modifier){
 }
 
 @Composable
-fun DropDown(options: List<String>, modifier: Modifier, onClick: () -> Unit){
+fun DropDown(options: List<String>, modifier: Modifier, onClick: (String) -> Unit){
     var expanded by remember { mutableStateOf(false) }
     var selectedOptionText by remember { mutableStateOf(options[0])}
 
@@ -289,7 +370,9 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
     var selectedBook = remember { mutableStateOf<Book?>(null) }
     var selectedStatus = remember { mutableStateOf("") }
     var bookResults = remember { mutableStateOf<List<Book>>(emptyList()) }
-//    var expanded by remember { mutableStateOf(false) }
+    var statusExpanded by remember { mutableStateOf(false) }
+
+    val statusOptions = listOf("Status", "Complete", "Ongoing", "Dropped")
 
     val bookApiClient = BookApiClient()
 
@@ -342,15 +425,52 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         })
                     }
                 }
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .size(192.dp, 50.dp)
+                        .clip(RoundedCornerShape(1.dp))
+                        .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
+                        .clickable { statusExpanded = !statusExpanded },
+                ) {
+                    Text(
+                        text = selectedStatus.value,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 10.dp),
+                        color = lightgrey
+                    )
+                    Icon(
+                        Icons.Filled.ArrowDropDown,
+                        "contentDescription",
+                        Modifier.align(Alignment.CenterEnd),
+                        tint = lightgrey
+                    )
+                    DropdownMenu(
+                        expanded = statusExpanded,
+                        onDismissRequest = { statusExpanded = false }
+                    ) {
+                        statusOptions.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedStatus.value = selectionOption
+                                    statusExpanded = false
+                                }
+                            ) {
+                                Text(text = selectionOption)
+                            }
+                        }
+                    }
+                }
             }
                },
         confirmButton = {
             Button(onClick = {
-                if (selectedBook.value != null /*&& selectedStatus.value.isNotEmpty()*/) {
+                if (selectedBook.value != null && selectedStatus.value.isNotEmpty()) {
                     val bookInfo = selectedBook.value
                     val status = selectedStatus.value
                     val book = BookModel(bookInfo!!.title, bookInfo.authors, "coverNotAvailable.png",
-                        bookInfo.publisher, bookInfo.publishYear, bookInfo.description, bookInfo.categories)
+                        bookInfo.publisher, bookInfo.publishYear, bookInfo.description, bookInfo.categories, status)
                     mainPageViewModel.addBook(book)
                     searchQuery.value = ""
                     selectedBook.value = null
