@@ -1,16 +1,13 @@
 package org.example.viewmodel
 
-import androidx.compose.runtime.*
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.runBlocking
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.BookModel
 import org.example.model.DatabaseManager
 import org.example.model.UserModel
-import org.example.view.SearchBar
 
 
 class MainPageViewModel (val userModel: UserModel,
@@ -34,8 +31,15 @@ class MainPageViewModel (val userModel: UserModel,
     var isProfileOpen by mutableStateOf(false)
         private set
 
+    var isRecommendOpen by mutableStateOf(false)
+        private set
+
     fun toggleProfilePage() {
         isProfileOpen = !isProfileOpen
+    }
+
+    fun toggleRecommendPage() {
+        isRecommendOpen = !isRecommendOpen
     }
 
     fun onBookClick(bookModel: BookModel) {
@@ -105,6 +109,7 @@ class MainPageViewModel (val userModel: UserModel,
     fun addBook(book: BookModel) {
         runBlocking {
             val bookId = dbManager.addBook(book)
+            dbManager.updateUserBookList(userModel.username, bookId)
             userModel.addBook(bookId)
         }
         bookLibrary.add(book)

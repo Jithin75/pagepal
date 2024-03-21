@@ -1,5 +1,6 @@
 package view
 
+import LoginViewState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,7 +20,7 @@ import theme.lightbrown
 import theme.whitevariation
 
 @Composable
-fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
+fun HamburgerMenuView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     Popup(
         alignment = Alignment.TopStart,
         onDismissRequest = {mainPageViewModel.onDismissHamburger()},
@@ -73,47 +74,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clickable(onClick = {})
-                        .fillMaxWidth()
-                        .height(48.dp)
-
-                ) {
-                    Text(
-                        text = "SETTINGS",
-                        modifier = Modifier.weight(1f).padding(start = 16.dp),
-                        color = whitevariation
-                    )
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 16.dp),
-                        tint = whitevariation
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clickable(onClick = {/* add Profile functionality */})
-                        .fillMaxWidth()
-                        .height(48.dp)
-
-                ) {
-                    Text(
-                        text = "FRIENDS",
-                        modifier = Modifier.weight(1f).padding(start = 16.dp),
-                        color = whitevariation
-                    )
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 16.dp),
-                        tint = whitevariation
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clickable(onClick = {/* add Recommendations functionality */})
+                        .clickable(onClick = {mainPageViewModel.toggleRecommendPage()})
                         .fillMaxWidth()
                         .height(48.dp)
 
@@ -132,7 +93,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                     )
                 }
                 Button(
-                    onClick = {/* add Sign out functionality */},
+                    onClick = {setCurrentState(LoginViewState(null, "login"))},
                     modifier = Modifier.padding(64.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red, contentColor = Color.White)
 
@@ -141,7 +102,10 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel) {
                 }
             }
             if (mainPageViewModel.isProfileOpen) {
-                ProfilePageView(mainPageViewModel)
+                ProfilePageView(mainPageViewModel, setCurrentState)
+            }
+            if (mainPageViewModel.isRecommendOpen) {
+                RecommendationView(mainPageViewModel)
             }
         }
     )

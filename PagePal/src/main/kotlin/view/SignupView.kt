@@ -207,3 +207,4 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
         }
     }
 }
+
