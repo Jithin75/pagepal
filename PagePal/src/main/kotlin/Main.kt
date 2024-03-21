@@ -109,8 +109,8 @@ fun main() = application {
     val dbManager = DatabaseManager(database)
 
     runBlocking {
-        dbManager.clearBookCollection()
-        dbManager.clearUserCollection()
+//        dbManager.clearBookCollection()
+//        dbManager.clearUserCollection()
 
         val book = BookModel("Percy Jackson Bk 1", "Rick Riordian")
         val bookId = dbManager.addBook(book)

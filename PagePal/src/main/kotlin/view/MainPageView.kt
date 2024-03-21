@@ -34,6 +34,37 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
 import model.api.*
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.loadSvgPainter
+import androidx.compose.ui.res.loadXmlImageVector
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.singleWindowApplication
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.xml.sax.InputSource
+import java.io.File
+import java.io.IOException
+import java.net.URL
+import org.jetbrains.skia.Image
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import model.ImageLoader
+
+
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel) {
     val sortOptions =  listOf("Sort", "Title", "Author", "Recently Added")
@@ -199,7 +230,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                             .weight(1f)
                     ) {
                         var displayedBooks = mainPageViewModel.getUserLibrary()
-                        val library = displayedBooks.value
+                        val library = displayedBooks
                         items(library.size) { index ->
                             BookItem(
                                 library[index],
@@ -298,13 +329,13 @@ fun DropDown(options: List<String>, modifier: Modifier, onClick: (String) -> Uni
 
 @Composable
 fun BookItem(book: BookModel, onClick: () -> Unit) {
+    val imageLoader = ImageLoader()
     Box(
         modifier = Modifier
             .fillMaxSize()
             .clickable(onClick = onClick)
             .padding(8.dp)
     ) {
-        val painter = painterResource(book.cover)
 
         Column (
             modifier = Modifier.fillMaxSize(),
@@ -312,10 +343,21 @@ fun BookItem(book: BookModel, onClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // cover
-            Image(
-                painter = painter,
-                contentDescription = book.title
-            )
+            if (book.cover == "coverNotAvailable.png") {
+                val painter = painterResource(book.cover)
+                Image(
+                    painter = painter,
+                    contentDescription = book.title,
+                    modifier = Modifier.size(300.dp, 300.dp)
+                )
+            } else {
+                imageLoader.AsyncImage(
+                    load = { imageLoader.loadImageBitmap(book.cover) },
+                    painterFor = { remember { BitmapPainter(it) } },
+                    contentDescription = book.title,
+                    modifier = Modifier.size(300.dp, 300.dp)
+                )
+            }
 
             // title
             Text(
@@ -346,22 +388,38 @@ fun BookItem(book: BookModel, onClick: () -> Unit) {
 }
 
 //@Composable
-//fun refreshDisplay(mainPageViewModel: MainPageViewModel, modifier: Modifier) {
-//    LazyVerticalGrid(
-//        columns = GridCells.Fixed(5),
-//        modifier = modifier
-//    ) {
-//        //coroutineScope.launch {
-//        val library = mainPageViewModel.getUserLibrary()
-//        items(library.size) { index ->
-//            BookItem(
-//                library[index],
-//                onClick = { mainPageViewModel.onBookClick(library[index]) }
-//            )
+//fun <T> AsyncImage(
+//    load: suspend () -> T,
+//    painterFor: @Composable (T) -> Painter,
+//    contentDescription: String,
+//    modifier: Modifier = Modifier,
+//    contentScale: ContentScale = ContentScale.Fit,
+//) {
+//    val image: T? by produceState<T?>(null) {
+//        value = withContext(Dispatchers.IO) {
+//            try {
+//                load()
+//            } catch (e: IOException) {
+//                // instead of printing to console, you can also write this to log,
+//                // or show some error placeholder
+//                e.printStackTrace()
+//                null
+//            }
 //        }
-//        //}
+//    }
+//
+//    if (image != null) {
+//        Image(
+//            painter = painterFor(image!!),
+//            contentDescription = contentDescription,
+//            contentScale = contentScale,
+//            modifier = modifier
+//        )
 //    }
 //}
+//
+//fun loadImageBitmap(url: String): ImageBitmap =
+//    URL(url).openStream().buffered().use(::loadImageBitmap)
 
 @Composable
 fun addBookWindow(mainPageViewModel: MainPageViewModel) {
@@ -469,7 +527,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                 if (selectedBook.value != null && selectedStatus.value.isNotEmpty()) {
                     val bookInfo = selectedBook.value
                     val status = selectedStatus.value
-                    val book = BookModel(bookInfo!!.title, bookInfo.authors, "coverNotAvailable.png",
+                    val book = BookModel(bookInfo!!.title, bookInfo.authors, bookInfo.img,
                         bookInfo.publisher, bookInfo.publishYear, bookInfo.description, bookInfo.categories, status)
                     mainPageViewModel.addBook(book)
                     searchQuery.value = ""
@@ -485,108 +543,5 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
             }
         }
     )
-
-//    Dialog(
-//        onDismissRequest = {
-//            searchQuery.value = ""
-//            selectedBook.value = null
-//            selectedStatus.value = ""
-//            bookResults.value = emptyList()
-//            mainPageViewModel.onDismissAddBook()},
-//        content = {
-//            Column(
-//                modifier = Modifier.padding(16.dp),
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//            ) {
-//                // You can add more content here if needed
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    TextField(
-//                        value = searchQuery.value,
-//                        onValueChange = { searchQuery.value = it },
-//                        label = { Text("Search") },
-//                        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-//                        keyboardActions = KeyboardActions(onSearch = { /* Handle search */ })
-//                    )
-//                    Button(onClick = {
-//                        bookResults.value = bookApiClient.searchBooks(searchQuery.value)
-//                    }) {
-//                        Text("Search")
-//                    }
-//                }
-//                Spacer(modifier = Modifier.height(16.dp))
-//                DropdownMenu(
-//                    expanded = selectedBook.value != null,
-//                    onDismissRequest = { selectedBook.value = null }
-//                ) {
-//                    bookResults.value.forEach { book ->
-//                        DropdownMenuItem(
-//                            onClick = {
-//                                selectedBook.value = book
-//                            }
-//                        ) {
-//                            Text(book.title)
-//                        }
-//                    }
-//                }
-//                Column(
-//                    modifier = Modifier.padding(16.dp)
-//                ) {
-//                    Spacer(modifier = Modifier.height(8.dp))
-//
-//                    DropdownMenu(
-//                        expanded = selectedStatus.value.isNotEmpty(),
-//                        onDismissRequest = { selectedStatus.value = "" }
-//                    ) {
-//                        listOf("Complete", "Ongoing", "Dropped").forEach { status ->
-//                            DropdownMenuItem(
-//                                onClick = {
-//                                    selectedStatus.value = status
-//                                }
-//                            ) {
-//                                Text(status)
-//                            }
-//                        }
-//                    }
-//                    Spacer(modifier = Modifier.height(16.dp))
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        horizontalArrangement = Arrangement.End
-//                    ) {
-//                        Button(onClick = {
-//                            if (selectedBook.value != null && selectedStatus.value.isNotEmpty()) {
-//                                val bookInfo = selectedBook.value
-//                                val status = selectedStatus.value
-//                                val book = BookModel(bookInfo!!.title, bookInfo.authors, "coverNotAvailable.png",
-//                                    bookInfo.publisher, bookInfo.publishYear, bookInfo.description, bookInfo.categories)
-//                                mainPageViewModel.addBook(book)
-//                                searchQuery.value = ""
-//                                selectedBook.value = null
-//                                selectedStatus.value = ""
-//                                bookResults.value = emptyList()
-//                                mainPageViewModel.onDismissAddBook()
-//                            }
-//                        },
-//                            enabled = selectedBook.value != null && selectedStatus.value.isNotEmpty()
-//                        ) {
-//                            Text("Add")
-//                        }
-//                        Button(onClick = {
-//                            searchQuery.value = ""
-//                            selectedBook.value = null
-//                            selectedStatus.value = ""
-//                            bookResults.value = emptyList()
-//                            mainPageViewModel.onDismissAddBook()
-//                        }) {
-//                            Text("Cancel")
-//                        }
-//                    }
-//
-//                }
-//            }
-//        }
-//    )
 }
 

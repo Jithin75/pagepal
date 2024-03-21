@@ -6,6 +6,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import okhttp3.Response
 
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
+
 class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/books/v1/volumes") {
     private val client = OkHttpClient()
     private val gson = Gson()
@@ -23,6 +27,24 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
             return emptyList()
         }
         return parseBooks(jsonString)
+    }
+
+    fun searchBook(query: String): Book {
+        val formatQuery = query.replace(" ", "+")
+        val url = "$baseUrl?q=${formatQuery}&key=${apiKey}"
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        val jsonString = executeRequest(request)
+        if (jsonString == null) {
+            return Book()
+        }
+        val bookList = parseBooks(jsonString)
+        if (bookList == mutableListOf<Book>()) {
+            return Book()
+        }
+        return bookList[0]
     }
 
     private fun parseBooks(jsonString: String): List<Book> {
@@ -71,19 +93,18 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
     }
 }
 
-data class Book(val title: String, val authors: String, val img: String, val publisher: String, val publishYear: String,
-                val description: String, val categories: String)
+data class Book(val title: String = "N/A", val authors: String = "N/A", val img: String = "N/A",
+                val publisher: String = "N/A", val publishYear: String = "N/A",
+                val description: String = "N/A", val categories: String = "N/A")
 
 fun main() {
     val bookApiClient = BookApiClient()
-    val query = ""
-    val bookResults = bookApiClient.searchBooks(query)
+    val query = "dune"
+    val book = bookApiClient.searchBook(query)
     println("Search Result for '$query':")
-    bookResults?.forEachIndexed { index, book ->
-        println("${index + 1}. ${book.title} by ${book.authors}, published by ${book.publisher}, on ${book.publishYear}.")
-        println("   Categories: ${book.categories}")
-        println("   Description: ${book.description}")
-        println("   Image: ${book.img}")
-        println()
-    }
+    println("1. ${book.title} by ${book.authors}, published by ${book.publisher}, on ${book.publishYear}.")
+    println("   Categories: ${book.categories}")
+    println("   Description: ${book.description}")
+    println("   Image: ${book.img}")
+    println()
 }

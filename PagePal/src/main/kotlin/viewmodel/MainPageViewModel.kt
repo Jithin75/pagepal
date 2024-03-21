@@ -11,12 +11,19 @@ import org.example.model.BookModel
 import org.example.model.DatabaseManager
 import org.example.model.UserModel
 import org.example.view.SearchBar
+import java.io.File
+import java.io.FileOutputStream
+import javax.imageio.ImageIO
+import java.net.URL
+import java.nio.channels.Channels
+import java.awt.Image
+import java.awt.image.BufferedImage
 
 
 class MainPageViewModel (val userModel: UserModel,
                          val bookLibrary : MutableList<BookModel>,
                          val dbManager: DatabaseManager){
-    var displayedBooks: MutableState<MutableList<BookModel>> = mutableStateOf(bookLibrary.toMutableList())
+    var displayedBooks by mutableStateOf(bookLibrary.toMutableList())
         private set
 
     var isHamburgerOpen by mutableStateOf(false)
@@ -66,23 +73,23 @@ class MainPageViewModel (val userModel: UserModel,
 
     fun statusFilter(status: String) {
         if (status == "Status") {
-            displayedBooks.value = bookLibrary.toMutableList()
+            displayedBooks = bookLibrary.toMutableList()
         } else {
-            displayedBooks.value = bookLibrary.filter { it.status.contains(status, ignoreCase = true) }.toMutableList()
+            displayedBooks = bookLibrary.filter { it.status.contains(status, ignoreCase = true) }.toMutableList()
         }
     }
 
     fun sortFilter(sortType: String) {
         if (sortType == "Sort" || sortType == "Recently Added") {
-            displayedBooks.value = bookLibrary.toMutableList()
+            displayedBooks = bookLibrary.toMutableList()
         } else if (sortType == "Title") {
-            displayedBooks.value = bookLibrary.sortedBy { it.title }.toMutableList()
+            displayedBooks = bookLibrary.sortedBy { it.title }.toMutableList()
         } else {
-            displayedBooks.value = bookLibrary.sortedBy { it.author }.toMutableList()
+            displayedBooks = bookLibrary.sortedBy { it.author }.toMutableList()
         }
     }
 
-    fun getUserLibrary(): MutableState<MutableList<BookModel>> {
+    fun getUserLibrary(): MutableList<BookModel> {
         /*val library = mutableListOf<BookModel>()
 
         val client = MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
@@ -103,23 +110,25 @@ class MainPageViewModel (val userModel: UserModel,
     }
 
     fun addBook(book: BookModel) {
+
         runBlocking {
             val bookId = dbManager.addBook(book)
             userModel.addBook(bookId)
         }
+
         bookLibrary.add(book)
-        displayedBooks.value.add(book)
+        displayedBooks.add(book)
     }
 
     fun searchResults(searchValue: String) {
         if (searchValue.isNotBlank()) {
-            displayedBooks.value = bookLibrary.filter { it.title.contains(searchValue, ignoreCase = true) }.toMutableList()
+            displayedBooks = bookLibrary.filter { it.title.contains(searchValue, ignoreCase = true) }.toMutableList()
         } else {
-            displayedBooks.value = bookLibrary.toMutableList() // Reset to original bookLibrary if search is empty
+            displayedBooks = bookLibrary.toMutableList() // Reset to original bookLibrary if search is empty
         }
     }
 
     fun refreshDisplay() {
-        displayedBooks.value = bookLibrary.toMutableList()
+        displayedBooks = bookLibrary.toMutableList()
     }
 }
