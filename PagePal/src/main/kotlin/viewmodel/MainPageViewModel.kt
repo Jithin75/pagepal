@@ -1,5 +1,9 @@
 package org.example.viewmodel
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.*
 import kotlinx.coroutines.runBlocking
 import org.example.model.BookModel
@@ -28,8 +32,15 @@ class MainPageViewModel (val userModel: UserModel,
     var isProfileOpen by mutableStateOf(false)
         private set
 
+    var isRecommendOpen by mutableStateOf(false)
+        private set
+
     fun toggleProfilePage() {
         isProfileOpen = !isProfileOpen
+    }
+
+    fun toggleRecommendPage() {
+        isRecommendOpen = !isRecommendOpen
     }
 
     fun onBookClick(bookModel: BookModel) {
@@ -100,6 +111,7 @@ class MainPageViewModel (val userModel: UserModel,
 
         runBlocking {
             val bookId = dbManager.addBook(book)
+            dbManager.updateUserBookList(userModel.username, bookId)
             userModel.addBook(bookId)
         }
 

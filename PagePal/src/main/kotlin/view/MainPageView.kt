@@ -1,12 +1,13 @@
 package org.example.view
 
+import LoginViewState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.ui.window.Dialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Menu
@@ -19,9 +20,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import model.api.Book
+import model.api.BookApiClient
 import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
 import theme.*
@@ -43,7 +47,7 @@ import viewmodel.BookViewModel
 
 
 @Composable
-fun MainPageView(mainPageViewModel: MainPageViewModel) {
+fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     val sortOptions =  listOf("Sort", "Title", "Author", "Recently Added")
     val statusOptions = listOf("Status", "Complete", "Ongoing", "Dropped")
 
@@ -217,7 +221,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
                     }
                 }
                 if (mainPageViewModel.isHamburgerOpen) {
-                    HamburgerMenuView(mainPageViewModel)
+                    HamburgerMenuView(mainPageViewModel, setCurrentState)
                 }
 
                 if (mainPageViewModel.isAddBookOpen) {

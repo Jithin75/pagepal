@@ -1,10 +1,12 @@
 package model.api
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.Response
+import org.example.model.BookModel
+
 
 class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/books/v1/volumes") {
     private val client = OkHttpClient()
@@ -23,6 +25,28 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
             return emptyList()
         }
         return parseBooks(jsonString)
+    }
+//TODO: Need to rewrite this
+    fun searchBook(query: String): BookModel {
+        val formatQuery = query.replace(" ", "+")
+        val url = "$baseUrl?q=${formatQuery}&key=${apiKey}"
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        val jsonString = executeRequest(request)
+        if (jsonString == null) {
+            val b = BookModel("")
+            return b
+        }
+        val bookList = parseBooks(jsonString)
+        if (bookList == mutableListOf<Book>()) {
+            val b = BookModel("")
+            return b
+        }
+        val rawBook = bookList[0]
+        val b = BookModel(rawBook.title, rawBook.authors, rawBook.img, rawBook.publisher, rawBook.publishYear, rawBook.description, rawBook.categories)
+        return b
     }
 
     fun searchBook(query: String): Book {

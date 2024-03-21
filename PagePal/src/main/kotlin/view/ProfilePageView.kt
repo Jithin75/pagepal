@@ -1,5 +1,6 @@
 package view
 
+import LoginViewState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,7 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,6 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.mongodb.MongoClientSettings
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import kotlinx.coroutines.runBlocking
+import org.bson.codecs.configuration.CodecRegistries
+import org.bson.codecs.configuration.CodecRegistry
+import org.bson.codecs.pojo.PojoCodecProvider
+import org.example.model.DatabaseManager
 import org.example.viewmodel.MainPageViewModel
 import theme.darkblue
 import theme.grey
@@ -22,7 +30,23 @@ import theme.lightbrown
 import theme.whitevariation
 
 @Composable
-fun ProfilePageView(mainPageViewModel: MainPageViewModel) {
+fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
+
+    var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(Unit) {
+        dbManager = runBlocking {
+            val pojoCodecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
+                MongoClientSettings.getDefaultCodecRegistry(),
+                CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
+            )
+            val client =
+                MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
+            val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry)
+            DatabaseManager(database)
+        }
+    }
+
     MaterialTheme {
         Scaffold (
             topBar = {
@@ -138,7 +162,11 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(
-                        onClick = { /* Delete Account */ },
+                        onClick = {
+                            runBlocking {
+                                dbManager?.deleteUser(mainPageViewModel.userModel.username)
+                            }
+                            setCurrentState(LoginViewState(null, "login")) },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = lightbrown,
                             contentColor = Color.White
