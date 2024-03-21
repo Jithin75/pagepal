@@ -57,7 +57,7 @@ fun App(currentView: MutableState<String>) {
     val dbManager = DatabaseManager(database)
     runBlocking {
         // Temporary, will be removed once the login authorization is fully functional
-        val book = BookModel("Les Miserables", "Victor Hugo", "lesMiserables.jpg")
+        val book = BookModel("Les Miserables", "Victor Hugo", "lesMiserables.jpg", description = "Set in the Parisian underworld and plotted like a detective story, the work follows Jean Valjean, a victim of society who has been imprisoned for 19 years for stealing a loaf of bread. A hardened criminal upon his release, he eventually reforms, becoming a successful industrialist and mayor of a northern town. Despite this he is haunted by an impulsive, regretted former crime and is pursued relentlessly by the police inspector Javert. Valjean eventually gives himself up for the sake of his adopted daughter, Cosette, and her husband, Marius. 'Les Miserables' is a vast panorama of Parisian society and its underworld, and it contains many famous episodes and passages.")
         val bookid = dbManager.addBook(book)
         library.add(bookid)
         bookLibrary.add(book)
