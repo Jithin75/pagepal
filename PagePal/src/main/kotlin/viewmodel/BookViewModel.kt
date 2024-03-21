@@ -31,7 +31,7 @@ class BookViewModel (val bookModel: BookModel){
     }
 
     fun getSummary(): String {
-        return bookModel.summary
+        return bookModel.description
     }
 
     fun getStatus(): String {
