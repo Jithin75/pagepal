@@ -26,6 +26,7 @@ import org.example.viewmodel.MainPageViewModel
 import theme.*
 import view.BookView
 import view.HamburgerMenuView
+import viewmodel.BookViewModel
 
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel) {
@@ -132,7 +133,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel) {
         )
         if(mainPageViewModel.isBookOpen) {
             val bookModel = mainPageViewModel.bookOpened ?: BookModel(title = "error")
-            BookView(mainPageViewModel, bookModel)
+            BookView(mainPageViewModel, BookViewModel(bookModel))
         }
     }
 }
@@ -233,7 +234,7 @@ fun BookItem(book: BookModel, onClick: () -> Unit) {
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = Color.White
+                    color = whitevariation
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 8.dp)
@@ -245,7 +246,7 @@ fun BookItem(book: BookModel, onClick: () -> Unit) {
                 style = TextStyle(
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp,
-                    color = Color(0xFFFFFFFF)
+                    color = whitevariation
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp)
