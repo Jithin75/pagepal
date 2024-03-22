@@ -68,15 +68,3 @@ class AIRecommender {
         }
     }
 }
-
-fun main() {
-    val recommendations = AIRecommender.getResponse(
-        "The user has read the following books: \\n" +
-                "God of Small things: Arundati Roy\\n" +
-                "Batman Hush: DC Comics\\n" +
-                "The Book Thief: Marcus Zusak\\n" +
-                "Gintama: Hideaki Sorachi\\n" +
-                "Flashpoint Paradox: DC Comics\\n"
-        , 10)
-    println("Recommendations: $recommendations")
-}
