@@ -144,7 +144,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                             Modifier.padding(horizontal = 20.dp)
                         ) {
                             Text(
-                                text = "SUMMARY:",
+                                text = "DESCRIPTION:",
                                 style = TextStyle(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 18.sp,
@@ -341,7 +341,10 @@ fun editWindow(bookViewModel: BookViewModel) {
                     Spacer(modifier = Modifier.width(96.dp))
 
                     OutlinedButton(
-                        onClick = {/* Confirm change functionality */},
+                        onClick = {
+                            bookViewModel.setStatus(selectedStatus)
+                            bookViewModel.onDismissEdit()
+                                  },
                         modifier = Modifier.width(120.dp),
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, lightbrown),
