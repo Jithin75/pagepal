@@ -92,12 +92,12 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel) {
                     val question = StringBuilder()
                     question.append("The user has read the following books: \\n")
 
-                    userBooks.value.forEachIndexed { index, book ->
+                    userBooks.forEachIndexed { index, book ->
                         // Append the title and authors to the question string
                         question.append("${book.title}: ${book.author}")
 
                         // Append newline character except for the last book
-                        if (index < userBooks.value.size - 1) {
+                        if (index < userBooks.size - 1) {
                             question.append("\\n")
                         }
                     }
