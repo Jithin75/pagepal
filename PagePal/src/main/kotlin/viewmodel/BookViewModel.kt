@@ -35,7 +35,10 @@ class BookViewModel (val bookModel: BookModel){
     }
 
     fun getStatus(): String {
-        // to be implemented
-        return "New"
+        return bookModel.status
+    }
+
+    fun setStatus(status: String) {
+        bookModel.status = status
     }
 }

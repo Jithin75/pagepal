@@ -47,7 +47,7 @@ import viewmodel.BookViewModel
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     val sortOptions =  listOf("Sort", "Title", "Author", "Recently Added")
-    val statusOptions = listOf("Status", "Complete", "Ongoing", "Dropped")
+    val statusOptions = listOf("Status", "New", "In Progress", "Completed")
 
     var sortExpanded by remember { mutableStateOf(false) }
     var sortSelectedOptionText by remember { mutableStateOf(sortOptions[0])}
@@ -103,12 +103,13 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                 .align(Alignment.CenterVertically),
                             mainPageViewModel
                         )
+                        /*
                         DropDown(
                             listOf("Genre", "Horror", "Fantasy", "SciFi"),
                             Modifier
                                 .padding(horizontal = 8.dp)
                                 .align(Alignment.CenterVertically)
-                        ) {}
+                        ) {}*/
                         Box(
                             contentAlignment = Alignment.CenterStart,
                             modifier = Modifier
@@ -375,7 +376,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
     var bookResults = remember { mutableStateOf<List<Book>>(emptyList()) }
     var statusExpanded by remember { mutableStateOf(false) }
 
-    val statusOptions = listOf("Status", "Complete", "Ongoing", "Dropped")
+    val statusOptions = listOf("Status", "New", "In Progress", "Completed")
 
     val bookApiClient = BookApiClient()
 
