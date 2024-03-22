@@ -25,6 +25,7 @@ import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.BookModel
 import org.example.model.DatabaseManager
+import org.example.view.BookItem
 import org.example.viewmodel.MainPageViewModel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -124,12 +125,12 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel) {
 
                     // Update displayedBooks within the composable context
                     val library = displayedBooks
-//                    items(library.size) { index ->
-//                        BookItem(
-//                            library[index],
-//                            onClick = { mainPageViewModel.onBookClick(library[index]) }
-//                        )
-//                    }
+                    items(library.size) { index ->
+                        BookItem(
+                            library[index],
+                            onClick = { mainPageViewModel.onBookClick(library[index]) }
+                        )
+                    }
                 }
             }
             }
