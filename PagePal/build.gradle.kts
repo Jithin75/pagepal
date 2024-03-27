@@ -34,6 +34,7 @@ compose.desktop {
         mainClass = "MainKt"
 
         nativeDistributions {
+            includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "team-102-5"
             packageVersion = "1.2.0"
