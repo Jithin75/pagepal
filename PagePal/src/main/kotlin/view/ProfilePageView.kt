@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mongodb.MongoClientSettings
@@ -23,6 +24,7 @@ import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.DatabaseManager
+import org.example.model.PasswordEncryption
 import org.example.viewmodel.MainPageViewModel
 import theme.darkblue
 import theme.grey
@@ -33,6 +35,16 @@ import theme.whitevariation
 fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
 
     var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
+    var currentPassword by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var verifyPassword by remember { mutableStateOf("") }
+    var showPasswordDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var newUsername by remember { mutableStateOf("") }
+    var verifyUsername by remember { mutableStateOf("") }
+    var showUsernameChangeDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         dbManager = runBlocking {
@@ -102,43 +114,14 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Personal Information
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Name: ${mainPageViewModel.userModel.name}",
-                            color = whitevariation,
-                            style = MaterialTheme.typography.body1,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "Email: ${mainPageViewModel.userModel.email}",
-                            color = whitevariation,
-                            style = MaterialTheme.typography.body1,
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "Date of Birth: ${mainPageViewModel.userModel.dateOfBirth}",
-                            color = whitevariation,
-                            style = MaterialTheme.typography.body1,
-                            textAlign = TextAlign.Center
-                        )
-                    }
 
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // Settings Options
                     Button(
-                        onClick = { /* Navigate to Change Password Screen */ },
+                        onClick = {
+                            showPasswordDialog = true
+                        },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = lightbrown,
                             contentColor = Color.White
@@ -150,7 +133,9 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(
-                        onClick = { /* Navigate to Change Username Screen */ },
+                        onClick = {
+                            showUsernameChangeDialog = true;
+                        },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = lightbrown,
                             contentColor = Color.White
@@ -163,10 +148,8 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
 
                     Button(
                         onClick = {
-                            runBlocking {
-                                dbManager?.deleteUser(mainPageViewModel.userModel.username)
-                            }
-                            setCurrentState(LoginViewState(null, "login")) },
+                            showConfirmationDialog = true;
+                        },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = lightbrown,
                             contentColor = Color.White
@@ -177,5 +160,205 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 }
             }
         )
+        if (showConfirmationDialog) {
+            AlertDialog(
+                onDismissRequest = { showConfirmationDialog = false },
+                title = {
+                    Text(
+                        text = "Delete Account",
+                        color = Color.White,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Are you sure you want to delete your account?",
+                        color = Color.White
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            runBlocking {
+                                dbManager?.deleteUser(mainPageViewModel.userModel.username)
+                            }
+                            showConfirmationDialog = false
+                            setCurrentState(LoginViewState(null, "login"))
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showConfirmationDialog = false }
+                    ) {
+                        Text("No")
+                    }
+                },
+                backgroundColor = darkblue
+            )
+        }
+        if (showUsernameChangeDialog) {
+            AlertDialog(
+                onDismissRequest = { showUsernameChangeDialog = false },
+                title = {
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 20.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Change Username",
+                            color = Color.White,
+                        )
+                    }
+                },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = newUsername,
+                            onValueChange = { newUsername = it },
+                            label = { Text("New Username", color = lightbrown) },
+                            textStyle = TextStyle(color = whitevariation)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = verifyUsername,
+                            onValueChange = { verifyUsername = it },
+                            label = { Text("Verify New Username", color = lightbrown) },
+                            textStyle = TextStyle(color = whitevariation)
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            val userExist = runBlocking {
+                                dbManager?.getUserByUsername(newUsername)
+                            }
+                            if (userExist == null) {
+                                if (newUsername == verifyUsername) {
+                                    runBlocking {
+                                        dbManager?.updateUsername(mainPageViewModel.userModel.username, newUsername)
+                                    }
+                                    mainPageViewModel.userModel.username = newUsername
+                                    showUsernameChangeDialog = false
+                                } else {
+                                    errorMessage = "Usernames do not match"
+                                }
+                            } else {
+                                errorMessage = "Username already taken"
+                            }
+                        }
+                    ) {
+                        Text(text = "Change")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showUsernameChangeDialog = false }
+                    ) {
+                        Text(text = "Cancel")
+                    }
+                },
+                backgroundColor = darkblue
+            )
+        }
+        if (showPasswordDialog) {
+            AlertDialog(
+                onDismissRequest = { showPasswordDialog = false },
+                title = {
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 20.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Change Password",
+                            color = Color.White,
+                        )
+                    }
+                },
+                text = {
+                    Column {
+                        OutlinedTextField(
+                            value = currentPassword,
+                            onValueChange = { currentPassword = it },
+                            label = { Text("Current Password", color = lightbrown) },
+                            textStyle = TextStyle(color = whitevariation)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = newPassword,
+                            onValueChange = { newPassword = it },
+                            label = { Text("New Password", color = lightbrown) },
+                            textStyle = TextStyle(color = whitevariation)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = verifyPassword,
+                            onValueChange = { verifyPassword = it },
+                            label = { Text("Verify New Password", color = lightbrown) },
+                            textStyle = TextStyle(color = whitevariation)
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            if (PasswordEncryption.verifyPassword(currentPassword, mainPageViewModel.userModel.password)) {
+                                if (newPassword == verifyPassword) {
+                                    runBlocking {
+                                        dbManager?.changePassword(mainPageViewModel.userModel.username, currentPassword, newPassword)
+                                    }
+                                    mainPageViewModel.userModel.password = PasswordEncryption.hashPassword(newPassword)
+                                    showPasswordDialog = false
+                                } else {
+                                    errorMessage = "Passwords do not match"
+                                }
+                            } else {
+                                errorMessage = "Incorrect current password"
+                            }
+                        }
+                    ) {
+                        Text(text = "Change")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { showPasswordDialog = false }
+                    ) {
+                        Text(text = "Cancel")
+                    }
+                },
+                backgroundColor = darkblue
+            )
+        }
+        if (errorMessage.isNotEmpty()) {
+            AlertDialog(
+                onDismissRequest = { errorMessage = "" },
+                title = {
+                    Text(
+                        text = "Error",
+                        color = Color.White
+                    )
+                },
+                text = {
+                    Text(
+                        text = errorMessage,
+                        color = Color.White
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { errorMessage = "" }
+                    ) {
+                        Text(text = "OK")
+                    }
+                },
+                backgroundColor = darkblue
+            )
+        }
     }
 }

@@ -6,10 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,7 +27,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import model.ImageLoader
-import org.example.model.BookModel
 import org.example.viewmodel.MainPageViewModel
 import theme.*
 import viewmodel.BookViewModel
@@ -180,7 +179,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                         fontSize = 18.sp,
                                         color = whitevariation
                                     ),
-                                    textAlign = TextAlign.Left,
+                                    textAlign = TextAlign.Left
                                 )
 
                                 Text(
@@ -189,6 +188,50 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 18.sp,
                                         color = green
+                                    ),
+                                    textAlign = TextAlign.Left,
+                                    modifier = Modifier.padding(start = 10.dp)
+                                )
+
+                                Text(
+                                    text = "CHAPTER:",
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp,
+                                        color = whitevariation
+                                    ),
+                                    textAlign = TextAlign.Left,
+                                    modifier = Modifier.padding(start = 30.dp)
+                                )
+
+                                Text(
+                                    text = bookViewModel.getChapter(),
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp,
+                                        color = green // Change color to green
+                                    ),
+                                    textAlign = TextAlign.Left,
+                                    modifier = Modifier.padding(start = 10.dp)
+                                )
+
+                                Text(
+                                    text = "PAGE:",
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp,
+                                        color = whitevariation
+                                    ),
+                                    textAlign = TextAlign.Left,
+                                    modifier = Modifier.padding(start = 30.dp)
+                                )
+
+                                Text(
+                                    text = bookViewModel.getPage(),
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp,
+                                        color = green // Change color to green
                                     ),
                                     textAlign = TextAlign.Left,
                                     modifier = Modifier.padding(start = 10.dp)
@@ -208,11 +251,14 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
 @Composable
 fun editWindow(bookViewModel: BookViewModel) {
     var selectedStatus by remember {mutableStateOf(bookViewModel.getStatus())}
+    var chapter by remember { mutableStateOf(bookViewModel.getChapter()) }
+    var page by remember { mutableStateOf(bookViewModel.getPage()) }
     var statusList : List<String> = listOf("New", "In Progress", "Completed")
 
     Popup(
         alignment = Alignment.Center,
         onDismissRequest = {bookViewModel.onDismissEdit()},
+        properties = PopupProperties(focusable = true),
         content = {
             Column(
                 modifier = Modifier
@@ -304,6 +350,29 @@ fun editWindow(bookViewModel: BookViewModel) {
                     }
                 }
 
+                TextField(
+                    value = chapter,
+                    onValueChange = { chapter = it },
+                    label = { Text("Chapter", color = lightbrown) },
+                    textStyle = TextStyle(color = whitevariation),
+                    modifier = Modifier
+                        .widthIn(min = 200.dp, max = 240.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+
+                // Input field for Page
+                TextField(
+                    value = page,
+                    onValueChange = { page = it },
+                    label = { Text("Page", color = lightbrown) },
+                    textStyle = TextStyle(color = whitevariation),
+                    modifier = Modifier
+                        .widthIn(min = 200.dp, max = 240.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                )
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -343,6 +412,8 @@ fun editWindow(bookViewModel: BookViewModel) {
                     OutlinedButton(
                         onClick = {
                             bookViewModel.setStatus(selectedStatus)
+                            bookViewModel.setChapter(chapter)
+                            bookViewModel.setPage(page)
                             bookViewModel.onDismissEdit()
                                   },
                         modifier = Modifier.width(120.dp),
