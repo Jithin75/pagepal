@@ -98,20 +98,6 @@ fun main() = application {
         window.minimumSize = Dimension(1280, 720)
         App(mutableStateOf("login"))
     }
-
-    val pojoCodecRegistry: CodecRegistry = fromRegistries(
-        MongoClientSettings.getDefaultCodecRegistry(),
-        fromProviders(PojoCodecProvider.builder().automatic(true).build())
-    )
-
-    val client = MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
-    val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry);
-    val dbManager = DatabaseManager(database)
-
-    runBlocking {
-        dbManager.clearBookCollection()
-        dbManager.clearUserCollection()
-    }
 }
 
 
