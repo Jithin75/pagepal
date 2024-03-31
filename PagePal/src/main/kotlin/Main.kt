@@ -109,64 +109,8 @@ fun main() = application {
     val dbManager = DatabaseManager(database)
 
     runBlocking {
-//        dbManager.clearBookCollection()
-//        dbManager.clearUserCollection()
-
-//        val book = BookModel("Percy Jackson Bk 1", "Rick Riordian")
-//        val bookId = dbManager.addBook(book)
-//        println("Book added: $bookId")
-//
-//        // Add a user
-//        val userBookList = mutableListOf(bookId)
-//        dbManager.addUser(UserModel("Bob", "password", userBookList))
-//        println("User added: Bob")
-//
-//        // Read the user
-//        println("User's book list before update:")
-//        dbManager.readUser()
-//
-//        // Add a new book
-//        val newBook = BookModel("One Punch Man", "ONE")
-//        val newBookId = dbManager.addBook(newBook)
-//        println("New book added: $newBookId")
-//
-//        // Update user's book list
-//        dbManager.updateUserBookList("Bob", newBookId)
-//        println("User's book list after update:")
-//        dbManager.readUser()
-//
-//        // Remove a book from user's collection
-//        dbManager.removeBookFromUser("Bob", newBookId)
-//        println("User's book list after removing $newBook:")
-//        dbManager.readUser()
-//
-//        // Delete the user
-//        dbManager.deleteUser("Bob")
-//        println("User deleted: Bob")
-//
-//        // Test username update
-//        dbManager.addUser(UserModel("Alice", "password", mutableListOf()))
-//        println("User added: Alice")
-//        dbManager.updateUsername("Alice", "NewAlice")
-//        println("User's username updated to NewAlice")
-//
-//        // Test credentials validation
-//        var exists = dbManager.getUserByUsername("NewAlice")
-//        if (exists != null) {
-//            println("NewAlice exists")
-//        } else {
-//            println("NewAlice does not exist")
-//        }
-//        exists = dbManager.getUserByUsername("Alice")
-//        if (exists != null) {
-//            println("Alice exists")
-//        } else {
-//            println("Alice does not exist")
-//        }
-//        var isValid = dbManager.isValidCredentials("NewAlice", "password")
-//        println("Is NewAlice's credentials valid? $isValid")
-//        isValid = dbManager.isValidCredentials("NewAlice", "wrongPassword")
-//        println("Is NewAlice's credentials valid? $isValid")
+        dbManager.clearBookCollection()
+        dbManager.clearUserCollection()
     }
 }
 

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.toList
 import org.bson.BsonDocument
 import org.bson.BsonValue
 import org.bson.conversions.Bson
+import org.bson.types.ObjectId
 
 class DatabaseManager(private val database: MongoDatabase) {
     private val userCollection: MongoCollection<UserModel> = database.getCollection("UserCollection")
@@ -16,6 +17,7 @@ class DatabaseManager(private val database: MongoDatabase) {
 
     suspend fun addBook(book: BookModel): BsonValue {
         var bookId: BsonValue
+        book.bookId = ObjectId().toHexString()
         bookCollection.insertOne(book).also {
             println("Inserted Book - ${it.insertedId}")
             bookId = it.insertedId
@@ -114,6 +116,27 @@ class DatabaseManager(private val database: MongoDatabase) {
             }
         }
         return library
+    }
+
+    suspend fun setBookStatus(book: BookModel, newStatus: String) {
+        val filter = Filters.eq(BookModel::bookId.name, book.bookId)
+        val update = Updates.set(BookModel::status.name, newStatus)
+        val result = bookCollection.updateOne(filter, update)
+        println("Updated ${result.modifiedCount} document(s)")
+    }
+
+    suspend fun setBookChapter(book: BookModel, newChapter: String) {
+        val filter = Filters.eq(BookModel::bookId.name, book.bookId)
+        val update = Updates.set(BookModel::chapter.name, newChapter)
+        val result = bookCollection.updateOne(filter, update)
+        println("Updated ${result.modifiedCount} document(s)")
+    }
+
+    suspend fun setBookPage(book: BookModel, newPage: String) {
+        val filter = Filters.eq(BookModel::bookId.name, book.bookId)
+        val update = Updates.set(BookModel::page.name, newPage)
+        val result = bookCollection.updateOne(filter, update)
+        println("Updated ${result.modifiedCount} document(s)")
     }
 
     suspend fun clearBookCollection() {
