@@ -112,13 +112,14 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(420.dp)
+                        .weight(1f)
                 )
 
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
                     textStyle = TextStyle(color = whitevariation),
-                    label = { Text("Username", color = lightbrown) }
+                    label = { Text("Username", color = lightbrown) },
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -128,13 +129,15 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                     onValueChange = { password = it },
                     label = { Text("Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
