@@ -121,6 +121,7 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(220.dp)
+                        .weight(1f)
                 )
 
                 OutlinedTextField(

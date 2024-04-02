@@ -97,107 +97,116 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                             .padding(horizontal = 8.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        SearchBar(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterVertically),
-                            mainPageViewModel
-                        )
-                        /*
-                        DropDown(
-                            listOf("Genre", "Horror", "Fantasy", "SciFi"),
-                            Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterVertically)
-                        ) {}*/
-                        Box(
-                            contentAlignment = Alignment.CenterStart,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterVertically)
-                                .size(192.dp, 50.dp)
-                                .clip(RoundedCornerShape(1.dp))
-                                .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
-                                .clickable { statusExpanded = !statusExpanded },
+                        Spacer(modifier = Modifier.weight(1f))
+                        Row(
+                            modifier = Modifier.weight(6f)
                         ) {
-                            Text(
-                                text = statusSelectedOptionText,
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(start = 10.dp),
-                                color = lightgrey
+                            SearchBar(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .weight(1.2f),
+                                mainPageViewModel
                             )
-                            Icon(
-                                Icons.Filled.ArrowDropDown,
-                                "contentDescription",
-                                Modifier.align(Alignment.CenterEnd),
-                                tint = lightgrey
-                            )
-                            DropdownMenu(
-                                expanded = statusExpanded,
-                                onDismissRequest = { statusExpanded = false }
+                            /*
+                            DropDown(
+                                listOf("Genre", "Horror", "Fantasy", "SciFi"),
+                                Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterVertically)
+                            ) {}*/
+                            Box(
+                                contentAlignment = Alignment.CenterStart,
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .size(192.dp, 50.dp)
+                                    .weight(0.9f)
+                                    .clip(RoundedCornerShape(1.dp))
+                                    .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
+                                    .clickable { statusExpanded = !statusExpanded },
                             ) {
-                                statusOptions.forEach { selectionOption ->
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            statusSelectedOptionText = selectionOption
-                                            mainPageViewModel.statusFilter(selectionOption)
-                                            statusExpanded = false
+                                Text(
+                                    text = statusSelectedOptionText,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    color = lightgrey
+                                )
+                                Icon(
+                                    Icons.Filled.ArrowDropDown,
+                                    "contentDescription",
+                                    Modifier.align(Alignment.CenterEnd),
+                                    tint = lightgrey
+                                )
+                                DropdownMenu(
+                                    expanded = statusExpanded,
+                                    onDismissRequest = { statusExpanded = false }
+                                ) {
+                                    statusOptions.forEach { selectionOption ->
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                statusSelectedOptionText = selectionOption
+                                                mainPageViewModel.statusFilter(selectionOption)
+                                                statusExpanded = false
+                                            }
+                                        ) {
+                                            Text(text = selectionOption)
                                         }
-                                    ) {
-                                        Text(text = selectionOption)
                                     }
                                 }
                             }
-                        }
-                        Box(
-                            contentAlignment = Alignment.CenterStart,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterVertically)
-                                .size(192.dp, 50.dp)
-                                .clip(RoundedCornerShape(1.dp))
-                                .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
-                                .clickable { sortExpanded = !sortExpanded },
-                        ) {
-                            Text(
-                                text = sortSelectedOptionText,
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(start = 10.dp),
-                                color = lightgrey
-                            )
-                            Icon(
-                                Icons.Filled.ArrowDropDown,
-                                "contentDescription",
-                                Modifier.align(Alignment.CenterEnd),
-                                tint = lightgrey
-                            )
-                            DropdownMenu(
-                                expanded = sortExpanded,
-                                onDismissRequest = { sortExpanded = false }
+                            Box(
+                                contentAlignment = Alignment.CenterStart,
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .size(192.dp, 50.dp)
+                                    .weight(0.9f)
+                                    .clip(RoundedCornerShape(1.dp))
+                                    .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
+                                    .clickable { sortExpanded = !sortExpanded },
                             ) {
-                                sortOptions.forEach { selectionOption ->
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            sortSelectedOptionText = selectionOption
-                                            mainPageViewModel.sortFilter(selectionOption)
-                                            sortExpanded = false
+                                Text(
+                                    text = sortSelectedOptionText,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(start = 10.dp),
+                                    color = lightgrey
+                                )
+                                Icon(
+                                    Icons.Filled.ArrowDropDown,
+                                    "contentDescription",
+                                    Modifier.align(Alignment.CenterEnd),
+                                    tint = lightgrey
+                                )
+                                DropdownMenu(
+                                    expanded = sortExpanded,
+                                    onDismissRequest = { sortExpanded = false }
+                                ) {
+                                    sortOptions.forEach { selectionOption ->
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                sortSelectedOptionText = selectionOption
+                                                mainPageViewModel.sortFilter(selectionOption)
+                                                sortExpanded = false
+                                            }
+                                        ) {
+                                            Text(text = selectionOption)
                                         }
-                                    ) {
-                                        Text(text = selectionOption)
                                     }
                                 }
                             }
+                            Button(
+                                onClick = { mainPageViewModel.onAddBookClick() },
+                                Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .size(64.dp,32.dp),
+                                colors = ButtonDefaults.buttonColors(backgroundColor = green)
+                            ) {
+                                Text("Add")
+                            }
                         }
-                        Button(
-                            onClick = { mainPageViewModel.onAddBookClick() },
-                            Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterVertically)
-                                .size(64.dp,32.dp),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = green)
-                        ) {
-                            Text("Add")
-                        }
+                        Spacer(modifier = Modifier.weight(1f))
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
