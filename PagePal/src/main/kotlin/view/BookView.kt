@@ -1,7 +1,9 @@
 package view
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -68,7 +70,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(380.dp),
+                            .width(420.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -85,10 +87,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                 load = { imageLoader.loadImageBitmap(bookViewModel.getCover()) },
                                 painterFor = { remember { BitmapPainter(it) } },
                                 contentDescription = bookViewModel.getTitle(),
-                                modifier = Modifier
-                                    .size(500.dp, 500.dp)
-                                    .weight(1f)
-                                    .padding(vertical = 20.dp)
+                                modifier = Modifier.size(500.dp, 500.dp)
                             )
                         }
 
@@ -101,6 +100,8 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                 color = whitevariation
                             ),
                             textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .padding(top = 10.dp)
                         )
 
                         //author
@@ -113,7 +114,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                             ),
                             textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .padding(bottom = 20.dp)
+                                .padding(vertical = 6.dp)
                         )
                     }
                     Column (
@@ -139,9 +140,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                             }
                         }
                         Column (
-                            Modifier
-                                .padding(horizontal = 20.dp)
-                                .fillMaxSize()
+                            Modifier.padding(horizontal = 20.dp)
                         ) {
                             Text(
                                 text = "DESCRIPTION:",
@@ -154,31 +153,24 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                 modifier = Modifier.padding(vertical = 20.dp)
                             )
 
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f)
-                                    .verticalScroll(rememberScrollState())
-                            ) {
-                                Text(
-                                    text = bookViewModel.getSummary(),
-                                    style = TextStyle(
-                                        fontSize = 16.sp,
-                                        color = whitevariation,
-                                        lineHeight = 20.sp,
-                                        lineHeightStyle = LineHeightStyle(
-                                            alignment = LineHeightStyle.Alignment.Center,
-                                            trim = LineHeightStyle.Trim.None
-                                        ),
+                            Text(
+                                text = bookViewModel.getSummary(),
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    color = whitevariation,
+                                    lineHeight = 20.sp,
+                                    lineHeightStyle = LineHeightStyle(
+                                        alignment = LineHeightStyle.Alignment.Center,
+                                        trim = LineHeightStyle.Trim.None
                                     ),
-                                    textAlign = TextAlign.Justify,
-                                )
-                            }
+                                ),
+                                textAlign = TextAlign.Justify,
+                            )
 
                             Row(
                                 modifier = Modifier
+                                    .padding(vertical = 120.dp)
                                     .fillMaxWidth()
-                                    .padding(vertical = 30.dp),
                             ) {
                                 Text(
                                     text = "STATUS:",
@@ -190,18 +182,12 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                     textAlign = TextAlign.Left
                                 )
 
-                                val status = bookViewModel.getStatus()
                                 Text(
-                                    text = status,
+                                    text = bookViewModel.getStatus(),
                                     style = TextStyle(
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 18.sp,
-                                        color = when(status) {
-                                            "New" -> green
-                                            "In Progress" -> Color.Yellow
-                                            "Completed" -> Color.Red
-                                            else -> lightbrown
-                                        }
+                                        color = green
                                     ),
                                     textAlign = TextAlign.Left,
                                     modifier = Modifier.padding(start = 10.dp)
