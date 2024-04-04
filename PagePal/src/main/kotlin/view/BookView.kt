@@ -30,7 +30,7 @@ import viewmodel.BookViewModel
 
 
 @Composable
-fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel){
+fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, isRecommended: Boolean = false){
     val imageLoader = ImageLoader()
     MaterialTheme{
         Scaffold (
@@ -106,8 +106,8 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                         Text(
                             text = bookViewModel.getAuthor(),
                             style = TextStyle(
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 16.sp,
                                 color = whitevariation
                             ),
                             textAlign = TextAlign.Center,
@@ -124,17 +124,29 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.End
                         ) {
-                            Button(
-                                onClick = {bookViewModel.onEditClick()},
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .padding(horizontal = 20.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = lightbrown,
-                                    contentColor = whitevariation
-                                )
-                            ) {
-                                Text("EDIT")
+                            if(!isRecommended) {
+                                Button(
+                                    onClick = { bookViewModel.onEditClick() },
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(horizontal = 20.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        backgroundColor = lightbrown,
+                                        contentColor = whitevariation
+                                    )
+                                ) {
+                                    Text("EDIT")
+                                }
+                            } else {
+                                Button(
+                                    onClick = { bookViewModel.onAddClick() },
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .padding(horizontal = 20.dp),
+                                    colors = ButtonDefaults.buttonColors(backgroundColor = green)
+                                ) {
+                                    Text("ADD")
+                                }
                             }
                         }
                         Column (
@@ -205,56 +217,60 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                                     textAlign = TextAlign.Left,
                                     modifier = Modifier.padding(start = 10.dp)
                                 )
+                                if(status == "In Progress") {
+                                    Text(
+                                        text = "CHAPTER:",
+                                        style = TextStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            color = whitevariation
+                                        ),
+                                        textAlign = TextAlign.Left,
+                                        modifier = Modifier.padding(start = 30.dp)
+                                    )
 
-                                Text(
-                                    text = "CHAPTER:",
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = whitevariation
-                                    ),
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier.padding(start = 30.dp)
-                                )
+                                    Text(
+                                        text = bookViewModel.getChapter(),
+                                        style = TextStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            color = green // Change color to green
+                                        ),
+                                        textAlign = TextAlign.Left,
+                                        modifier = Modifier.padding(start = 10.dp)
+                                    )
 
-                                Text(
-                                    text = bookViewModel.getChapter(),
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = green // Change color to green
-                                    ),
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier.padding(start = 10.dp)
-                                )
+                                    Text(
+                                        text = "PAGE:",
+                                        style = TextStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            color = whitevariation
+                                        ),
+                                        textAlign = TextAlign.Left,
+                                        modifier = Modifier.padding(start = 30.dp)
+                                    )
 
-                                Text(
-                                    text = "PAGE:",
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = whitevariation
-                                    ),
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier.padding(start = 30.dp)
-                                )
-
-                                Text(
-                                    text = bookViewModel.getPage(),
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = green // Change color to green
-                                    ),
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier.padding(start = 10.dp)
-                                )
+                                    Text(
+                                        text = bookViewModel.getPage(),
+                                        style = TextStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp,
+                                            color = green // Change color to green
+                                        ),
+                                        textAlign = TextAlign.Left,
+                                        modifier = Modifier.padding(start = 10.dp)
+                                    )
+                                }
                             }
                         }
                     }
                 }
                 if(bookViewModel.isEditOpen) {
                     editWindow(bookViewModel, mainPageViewModel)
+                }
+                if(bookViewModel.isAddOpen) {
+                    addWindow(bookViewModel)
                 }
             }
         )
@@ -266,7 +282,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
     var selectedStatus by remember {mutableStateOf(bookViewModel.getStatus())}
     var chapter by remember { mutableStateOf(bookViewModel.getChapter()) }
     var page by remember { mutableStateOf(bookViewModel.getPage()) }
-    var statusList : List<String> = listOf("New", "In Progress", "Completed")
+    val statusList : List<String> = listOf("New", "In Progress", "Completed")
 
     Popup(
         alignment = Alignment.Center,
@@ -275,7 +291,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
         content = {
             Column(
                 modifier = Modifier
-                    .background(color = darkblue)
+                    .background(color = darkblue, shape = RoundedCornerShape(16.dp))
                     .border(
                         BorderStroke(width = 4.dp, color = grey),
                         shape = RoundedCornerShape(16.dp)
@@ -363,32 +379,51 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
                     }
                 }
 
-                TextField(
-                    value = chapter,
-                    onValueChange = { chapter = it },
-                    label = { Text("Chapter", color = lightbrown) },
-                    textStyle = TextStyle(color = whitevariation),
-                    modifier = Modifier
-                        .widthIn(min = 200.dp, max = 240.dp)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                )
+                if(selectedStatus == "In Progress") {
+                    TextField(
+                        value = chapter,
+                        onValueChange = {
+                            if(it.isNotEmpty()) {
+                                chapter = it.filter { symbol ->
+                                    symbol.isDigit()
+                                }
+                            }
+                            else {
+                                chapter = ""
+                            }
+                        },
+                        label = { Text("Chapter", color = lightbrown) },
+                        textStyle = TextStyle(color = whitevariation),
+                        modifier = Modifier
+                            .widthIn(min = 200.dp, max = 240.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
 
-                // Input field for Page
-                TextField(
-                    value = page,
-                    onValueChange = { page = it },
-                    label = { Text("Page", color = lightbrown) },
-                    textStyle = TextStyle(color = whitevariation),
-                    modifier = Modifier
-                        .widthIn(min = 200.dp, max = 240.dp)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-                )
+                    // Input field for Page
+                    TextField(
+                        value = page,
+                        onValueChange = {
+                            if(it.isNotEmpty()) {
+                                page = it.filter { symbol ->
+                                    symbol.isDigit()
+                                }
+                            }
+                            else {
+                                page = ""
+                            }
+                        },
+                        label = { Text("Page", color = lightbrown) },
+                        textStyle = TextStyle(color = whitevariation),
+                        modifier = Modifier
+                            .widthIn(min = 200.dp, max = 240.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(top = 15.dp)
                 ) {
                     Button(
                         onClick = {
@@ -446,7 +481,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
                 }
 
                 Row(
-                    modifier = Modifier.padding(top = 40.dp, bottom = 20.dp),
+                    modifier = Modifier.padding(top = 30.dp, bottom = 20.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -481,6 +516,174 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
                         )
                     ) {
                         Text("CONFIRM")
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun addWindow(bookViewModel: BookViewModel) {
+    var selectedStatus by remember {mutableStateOf("New")}
+    var chapter by remember { mutableStateOf(bookViewModel.getChapter()) }
+    var page by remember { mutableStateOf(bookViewModel.getPage()) }
+    val statusList : List<String> = listOf("New", "In Progress", "Completed")
+
+    Popup (
+        alignment = Alignment.Center,
+        onDismissRequest = {bookViewModel.onDismissAdd()},
+        properties = PopupProperties(focusable = true),
+        content = {
+            Column(
+                modifier = Modifier
+                    .background(color = darkblue, shape = RoundedCornerShape(16.dp))
+                    .border(
+                        BorderStroke(width = 4.dp, color = grey),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.padding(
+                        vertical = 24.dp,
+                        horizontal = 32.dp
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "STATUS:",
+                        style = TextStyle(
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 18.sp,
+                            color = whitevariation
+                        ),
+                        textAlign = TextAlign.Left,
+                        modifier = Modifier.padding(end = 20.dp)
+                    )
+
+                    val cornerRadius = 16.dp
+                    var selectedIndex by remember { mutableStateOf(statusList.indexOf(selectedStatus)) }
+
+                    statusList.forEachIndexed { index, status ->
+
+                        OutlinedButton(
+                            onClick = {
+                                selectedIndex = index
+                                selectedStatus = statusList[index]
+                            },
+                            modifier = when (index) {
+                                0 -> Modifier
+                                    .offset(0.dp, 0.dp)
+                                    .zIndex(if (selectedIndex == index) 1f else 0f)
+
+                                else -> Modifier
+                                    .offset((-1 * index).dp, 0.dp)
+                                    .zIndex(if (selectedIndex == index) 1f else 0f)
+                            },
+                            shape = when (index) {
+                                0 -> RoundedCornerShape(
+                                    topStart = cornerRadius,
+                                    topEnd = 0.dp,
+                                    bottomStart = cornerRadius,
+                                    bottomEnd = 0.dp
+                                )
+
+                                statusList.size - 1 -> RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    topEnd = cornerRadius,
+                                    bottomStart = 0.dp,
+                                    bottomEnd = cornerRadius
+                                )
+
+                                else -> RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    topEnd = 0.dp,
+                                    bottomStart = 0.dp,
+                                    bottomEnd = 0.dp
+                                )
+                            },
+                            border = BorderStroke(
+                                1.dp, if (selectedIndex == index) {
+                                    lightbrown
+                                } else {
+                                    lightbrown.copy(alpha = 0.75f)
+                                }
+                            ),
+                            colors = if (selectedIndex == index) {
+                                ButtonDefaults.outlinedButtonColors(
+                                    backgroundColor = lightbrown.copy(alpha = 0.75f),
+                                    contentColor = lightbrown
+                                )
+                            } else {
+                                ButtonDefaults.outlinedButtonColors(
+                                    backgroundColor = darkblue,
+                                    contentColor = lightbrown
+                                )
+                            }
+                        ) {
+                            Text(status)
+                        }
+                    }
+                }
+
+                if (selectedStatus == "In Progress") {
+                    TextField(
+                        value = chapter,
+                        onValueChange = { chapter = it },
+                        label = { Text("Chapter", color = lightbrown) },
+                        textStyle = TextStyle(color = whitevariation),
+                        modifier = Modifier
+                            .widthIn(min = 200.dp, max = 240.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                    )
+
+                    // Input field for Page
+                    TextField(
+                        value = page,
+                        onValueChange = { page = it },
+                        label = { Text("Page", color = lightbrown) },
+                        textStyle = TextStyle(color = whitevariation),
+                        modifier = Modifier
+                            .widthIn(min = 200.dp, max = 240.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.padding(top = 40.dp, bottom = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    OutlinedButton(
+                        onClick = {bookViewModel.onDismissAdd()},
+                        modifier = Modifier.width(120.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, lightbrown),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = darkblue,
+                            contentColor = lightbrown
+                        )
+                    ) {
+                        Text("CLOSE")
+                    }
+
+                    Spacer(modifier = Modifier.width(96.dp))
+
+                    OutlinedButton(
+                        onClick = {/* Add Book Functionality */},
+                        modifier = Modifier.width(120.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, lightbrown),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = darkblue,
+                            contentColor = lightbrown
+                        )
+                    ) {
+                        Text("ADD")
                     }
                 }
             }

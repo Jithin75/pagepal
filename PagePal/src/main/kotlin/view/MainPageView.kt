@@ -33,13 +33,31 @@ import org.example.viewmodel.MainPageViewModel
 import theme.*
 import view.BookView
 import view.HamburgerMenuView
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import model.api.*
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
+import model.ImageLoader
 import viewmodel.BookViewModel
 
 
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
-    val sortOptions =  listOf("Sort", "Title", "Author", "Recently Added")
-    val statusOptions = listOf("Status", "New", "In Progress", "Completed")
+    val sortOptions =  listOf("Default","Title", "Author", "Recently Added")
+    val statusOptions = listOf("All","New", "In Progress", "Completed")
 
     var sortExpanded by remember { mutableStateOf(false) }
     var sortSelectedOptionText by remember { mutableStateOf(sortOptions[0])}
@@ -119,7 +137,8 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                     .clickable { statusExpanded = !statusExpanded },
                             ) {
                                 Text(
-                                    text = statusSelectedOptionText,
+                                    text = if(statusSelectedOptionText == "All") { "Status" }
+                                    else { statusSelectedOptionText },
                                     fontSize = 14.sp,
                                     modifier = Modifier.padding(start = 10.dp),
                                     color = lightgrey
@@ -159,7 +178,8 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                     .clickable { sortExpanded = !sortExpanded },
                             ) {
                                 Text(
-                                    text = sortSelectedOptionText,
+                                    text = if(sortSelectedOptionText == "Default") { "Sort" }
+                                    else { sortSelectedOptionText },
                                     fontSize = 14.sp,
                                     modifier = Modifier.padding(start = 10.dp),
                                     color = lightgrey
@@ -192,10 +212,10 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                 Modifier
                                     .padding(horizontal = 8.dp)
                                     .align(Alignment.CenterVertically)
-                                    .size(64.dp,32.dp),
+                                    .size(68.dp,36.dp),
                                 colors = ButtonDefaults.buttonColors(backgroundColor = green)
                             ) {
-                                Text("Add")
+                                Text("ADD")
                             }
                         }
                         Spacer(modifier = Modifier.weight(1f))
@@ -204,20 +224,26 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Book Grid
+                    val scrollState = rememberLazyGridState()
+                    var displayedBooks = mainPageViewModel.getUserLibrary()
                     LazyVerticalGrid(
+                        state = scrollState,
                         columns = GridCells.Fixed(5),
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        var displayedBooks = mainPageViewModel.getUserLibrary()
-                        val library = displayedBooks
-                        items(library.size) { index ->
+                        val library = displayedBooks.toList()
+                        items(items = library, key = { it.title }) { book : BookModel ->
                             BookItem(
-                                library[index],
-                                onClick = { mainPageViewModel.onBookClick(library[index]) }
+                                book,
+                                onClick = {mainPageViewModel.onBookClick(book)}
                             )
                         }
+                    }
+
+                    LaunchedEffect(displayedBooks) {
+                        scrollState.scrollToItem(0)
                     }
                 }
                 if (mainPageViewModel.isHamburgerOpen) {
@@ -261,7 +287,8 @@ fun SearchBar(modifier: Modifier, mainPageViewModel: MainPageViewModel){
             unfocusedIndicatorColor = Color.Transparent,
             placeholderColor = lightgrey,
             cursorColor = Color.Black,
-        )
+        ),
+        singleLine = true
     )
 }
 
@@ -371,16 +398,317 @@ fun BookItem(book: BookModel, onClick: () -> Unit) {
 @Composable
 fun addBookWindow(mainPageViewModel: MainPageViewModel) {
 
-    var searchQuery = remember { mutableStateOf("") }
-    var selectedBook = remember { mutableStateOf<Book?>(null) }
-    var selectedStatus = remember { mutableStateOf("") }
-    var bookResults = remember { mutableStateOf<List<Book>>(emptyList()) }
-    var statusExpanded by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedBook by remember { mutableStateOf<Book?>(null) }
+    var selectedStatus by remember { mutableStateOf("New") }
+    var bookResults by remember { mutableStateOf<List<Book>>(emptyList()) }
+    var chapter by remember { mutableStateOf("1") }
+    var page by remember { mutableStateOf("1") }
+    //var statusExpanded by remember { mutableStateOf(false) }
 
-    val statusOptions = listOf("Status", "New", "In Progress", "Completed")
+    val statusList : List<String> = listOf("New", "In Progress", "Completed")
 
     val bookApiClient = BookApiClient()
 
+    Popup(
+        alignment = Alignment.Center,
+        onDismissRequest = {
+            searchQuery = ""
+            selectedBook = null
+            selectedStatus = ""
+            bookResults = emptyList()
+            mainPageViewModel.onDismissAddBook()
+        },
+        properties = PopupProperties(focusable = true),
+        content = {
+            Column (
+                modifier = Modifier
+                    .background(color = darkblue, shape = RoundedCornerShape(16.dp))
+                    .border(
+                        BorderStroke(width = 4.dp, color = grey),
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.padding(
+                        start = 20.dp,
+                        end = 20.dp,
+                        top = 32.dp,
+                        bottom = 20.dp
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        label = { Text("Title", color = lightbrown) },
+                        textStyle = TextStyle(color = whitevariation),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Search
+                        )
+                    )
+
+                    Spacer(Modifier.width(10.dp))
+
+                    OutlinedButton(
+                        onClick = {
+                            // Call API with searchText and populate searchResults
+                            // This is a placeholder, replace it with your actual API call
+                            bookResults = bookApiClient.searchBooks(searchQuery)
+                        },
+                        Modifier
+                            .align(Alignment.CenterVertically)
+                            .width(100.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, lightbrown),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = darkblue,
+                            contentColor = lightbrown
+                        )
+                    ) {
+                        Text("SEARCH")
+                    }
+                    DropdownMenu(
+                        expanded = bookResults.isNotEmpty(),
+                        onDismissRequest = {
+                            bookResults = emptyList()
+                        },
+                        modifier = Modifier.width(IntrinsicSize.Min)
+                    ) {
+                        // Populate the dropdown menu with search results
+                        bookResults.forEach { result ->
+                            Text(result.title, modifier = Modifier.clickable {
+                                // Handle selection of search result here
+                                // For example, close popup and show details in a new window
+                                selectedBook = result
+                                searchQuery = result.title
+                                bookResults = emptyList()
+                            })
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.padding(
+                        vertical = 20.dp,
+                        horizontal = 32.dp
+                    ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    val cornerRadius = 16.dp
+                    var selectedIndex by remember { mutableStateOf(statusList.indexOf(selectedStatus)) }
+
+                    statusList.forEachIndexed { index, status ->
+
+                        OutlinedButton(
+                            onClick = {
+                                selectedIndex = index
+                                selectedStatus = statusList[index]
+                            },
+                            modifier = when (index) {
+                                0 -> Modifier
+                                    .offset(0.dp, 0.dp)
+                                    .zIndex(if (selectedIndex == index) 1f else 0f)
+
+                                else -> Modifier
+                                    .offset((-1 * index).dp, 0.dp)
+                                    .zIndex(if (selectedIndex == index) 1f else 0f)
+                            },
+                            shape = when (index) {
+                                0 -> RoundedCornerShape(
+                                    topStart = cornerRadius,
+                                    topEnd = 0.dp,
+                                    bottomStart = cornerRadius,
+                                    bottomEnd = 0.dp
+                                )
+
+                                statusList.size - 1 -> RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    topEnd = cornerRadius,
+                                    bottomStart = 0.dp,
+                                    bottomEnd = cornerRadius
+                                )
+
+                                else -> RoundedCornerShape(
+                                    topStart = 0.dp,
+                                    topEnd = 0.dp,
+                                    bottomStart = 0.dp,
+                                    bottomEnd = 0.dp
+                                )
+                            },
+                            border = BorderStroke(
+                                1.dp, if (selectedIndex == index) {
+                                    lightbrown
+                                } else {
+                                    lightbrown.copy(alpha = 0.75f)
+                                }
+                            ),
+                            colors = if (selectedIndex == index) {
+                                ButtonDefaults.outlinedButtonColors(
+                                    backgroundColor = lightbrown.copy(alpha = 0.75f),
+                                    contentColor = lightbrown
+                                )
+                            } else {
+                                ButtonDefaults.outlinedButtonColors(
+                                    backgroundColor = darkblue,
+                                    contentColor = lightbrown
+                                )
+                            }
+                        ) {
+                            Text(status)
+                        }
+                    }
+                }
+
+                if(selectedStatus == "In Progress") {
+
+                    TextField(
+                        value = chapter,
+                        onValueChange = {
+                            if(it.isNotEmpty()) {
+                                chapter = it.filter { symbol ->
+                                    symbol.isDigit()
+                                }
+                            }
+                            else {
+                                chapter = ""
+                            }
+                        },
+                        label = { Text("Chapter", color = lightbrown) },
+                        textStyle = TextStyle(color = whitevariation),
+                        modifier = Modifier
+                            .widthIn(min = 200.dp, max = 240.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+
+                    // Input field for Page
+                    TextField(
+                        value = page,
+                        onValueChange = {
+                            if(it.isNotEmpty()) {
+                                page = it.filter { symbol ->
+                                    symbol.isDigit()
+                                }
+                            }
+                            else {
+                                page = ""
+                            }
+                        },
+                        label = { Text("Page", color = lightbrown) },
+                        textStyle = TextStyle(color = whitevariation),
+                        modifier = Modifier
+                            .widthIn(min = 200.dp, max = 240.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.padding(top = 25.dp, bottom = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            searchQuery = ""
+                            selectedBook = null
+                            selectedStatus = ""
+                            bookResults = emptyList()
+                            mainPageViewModel.onDismissAddBook()
+                        },
+                        modifier = Modifier.width(120.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, lightbrown),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = darkblue,
+                            contentColor = lightbrown
+                        )
+                    ) {
+                        Text("CLOSE")
+                    }
+
+                    Spacer(modifier = Modifier.width(96.dp))
+
+                    OutlinedButton(
+                        onClick = {
+                            if (selectedBook != null) {
+                                val bookInfo = selectedBook
+                                val book = BookModel(
+                                    title = bookInfo!!.title,
+                                    author = bookInfo.authors,
+                                    cover = bookInfo.img,
+                                    publisher = bookInfo.publisher,
+                                    publishYear = bookInfo.publishYear,
+                                    description = bookInfo.description,
+                                    categories = bookInfo.categories,
+                                    status = selectedStatus,
+                                    chapter = chapter,
+                                    page = page)
+                                mainPageViewModel.addBook(book)
+                                searchQuery = ""
+                                selectedBook = null
+                                selectedStatus = ""
+                                bookResults = emptyList()
+                                chapter = "1"
+                                page = "1"
+                                mainPageViewModel.onDismissAddBook()
+                            }
+                        },
+                        modifier = Modifier.width(120.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = BorderStroke(1.dp, lightbrown),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            backgroundColor = darkblue,
+                            contentColor = lightbrown
+                        )
+                    ) {
+                        Text("ADD")
+                    }
+                }
+                /*
+                Box(
+                    contentAlignment = Alignment.CenterStart,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .size(192.dp, 50.dp)
+                        .clip(RoundedCornerShape(1.dp))
+                        .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
+                        .clickable { statusExpanded = !statusExpanded },
+                ) {
+                    Text(
+                        text = selectedStatus.value,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 10.dp),
+                        color = lightgrey
+                    )
+                    Icon(
+                        Icons.Filled.ArrowDropDown,
+                        "contentDescription",
+                        Modifier.align(Alignment.CenterEnd),
+                        tint = lightgrey
+                    )
+                    DropdownMenu(
+                        expanded = statusExpanded,
+                        onDismissRequest = { statusExpanded = false }
+                    ) {
+                        statusOptions.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedStatus.value = selectionOption
+                                    statusExpanded = false
+                                }
+                            ) {
+                                Text(text = selectionOption)
+                            }
+                        }
+                    }
+                }*/
+            }
+        }
+    )
+    /*
     AlertDialog(
         onDismissRequest = {
             searchQuery.value = ""
@@ -469,10 +797,10 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                     }
                 }
             }
-               },
+        },
         confirmButton = {
             Button(onClick = {
-                if (selectedBook.value != null && selectedStatus.value.isNotEmpty()) {
+                if (selectedBook.value != null && selectedStatus.value != "Status") {
                     val bookInfo = selectedBook.value
                     val status = selectedStatus.value
                     val book = BookModel(bookInfo!!.title, bookInfo.authors, bookInfo.img,
@@ -490,6 +818,6 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                 Text("Add")
             }
         }
-    )
+    ) */
 }
 

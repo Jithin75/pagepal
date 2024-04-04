@@ -12,6 +12,8 @@ class BookViewModel (val bookModel: BookModel, val dbManager: DatabaseManager){
         private set
 
     var showConfirmationDialog by mutableStateOf(false)
+
+    var isAddOpen by mutableStateOf(false)
         private set
 
     fun onEditClick() {
@@ -20,6 +22,14 @@ class BookViewModel (val bookModel: BookModel, val dbManager: DatabaseManager){
 
     fun onDismissEdit() {
         isEditOpen = false
+    }
+
+    fun onAddClick() {
+        isAddOpen = true
+    }
+
+    fun onDismissAdd() {
+        isAddOpen = false
     }
 
     fun getCover(): String {
