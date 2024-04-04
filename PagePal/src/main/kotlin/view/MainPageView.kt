@@ -36,6 +36,8 @@ import model.api.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -218,20 +220,26 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Book Grid
+                    val scrollState = rememberLazyGridState()
+                    var displayedBooks = mainPageViewModel.getUserLibrary()
                     LazyVerticalGrid(
+                        state = scrollState,
                         columns = GridCells.Fixed(5),
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        //var displayedBooks = mainPageViewModel.getUserLibrary()
-                        val library = mainPageViewModel.getUserLibrary()
-                        items(library.size) { index ->
+                        val library = displayedBooks.toList()
+                        items(items = library, key = { it.title }) { book : BookModel ->
                             BookItem(
-                                library[index],
-                                onClick = { mainPageViewModel.onBookClick(library[index]) }
+                                book,
+                                onClick = {mainPageViewModel.onBookClick(book)}
                             )
                         }
+                    }
+
+                    LaunchedEffect(displayedBooks) {
+                        scrollState.scrollToItem(0)
                     }
                 }
                 if (mainPageViewModel.isHamburgerOpen) {
