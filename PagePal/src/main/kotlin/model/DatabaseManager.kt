@@ -7,7 +7,6 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import org.bson.BsonDocument
-import org.bson.BsonValue
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
@@ -16,11 +15,9 @@ class DatabaseManager(private val database: MongoDatabase) {
     private val bookCollection: MongoCollection<BookModel> = database.getCollection("BookCollection")
 
     suspend fun addBook(book: BookModel): String {
-        var bookId: BsonValue
         book.bookId = ObjectId().toHexString()
         bookCollection.insertOne(book).also {
             println("Inserted Book - ${it.insertedId}")
-            bookId = it.insertedId
         }
         return book.bookId
     }

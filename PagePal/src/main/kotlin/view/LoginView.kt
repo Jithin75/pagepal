@@ -120,6 +120,7 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                     onValueChange = { username = it },
                     textStyle = TextStyle(color = whitevariation),
                     label = { Text("Username", color = lightbrown) },
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -130,6 +131,7 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                     label = { Text("Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
                     visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
