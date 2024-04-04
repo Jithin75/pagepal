@@ -68,7 +68,7 @@ class MainPageViewModel (val userModel: UserModel,
     }
 
     fun statusFilter(status: String) {
-        if (status == "Status") {
+        if (status == "All") {
             displayedBooks = bookLibrary.toMutableList()
         } else {
             displayedBooks = bookLibrary.filter { it.status.contains(status, ignoreCase = true) }.toMutableList()
@@ -76,7 +76,7 @@ class MainPageViewModel (val userModel: UserModel,
     }
 
     fun sortFilter(sortType: String) {
-        if (sortType == "Sort" || sortType == "Recently Added") {
+        if (sortType == "Default" || sortType == "Recently Added") {
             displayedBooks = bookLibrary.toMutableList()
         } else if (sortType == "Title") {
             displayedBooks = bookLibrary.sortedBy { it.title }.toMutableList()
