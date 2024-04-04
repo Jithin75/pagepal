@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,6 +27,7 @@ import theme.lightbrown
 import theme.whitevariation
 import viewmodel.ProfilePageViewModel
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: ProfilePageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     MaterialTheme {
@@ -189,14 +191,16 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                             value = profilePageViewModel.newUsername,
                             onValueChange = { profilePageViewModel.toggleNewUsername(it) },
                             label = { Text("New Username", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation)
+                            textStyle = TextStyle(color = whitevariation),
+                            singleLine = true
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = profilePageViewModel.verifyUsername,
                             onValueChange = { profilePageViewModel.toggleVerifyUsername(it) },
                             label = { Text("Verify New Username", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation)
+                            textStyle = TextStyle(color = whitevariation),
+                            singleLine = true
                         )
                     }
                 },
@@ -212,6 +216,8 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                                         mainPageViewModel.dbManager?.updateUsername(mainPageViewModel.userModel.username, profilePageViewModel.newUsername)
                                     }
                                     mainPageViewModel.userModel.username = profilePageViewModel.newUsername
+                                    profilePageViewModel.toggleNewUsername("")
+                                    profilePageViewModel.toggleVerifyUsername("")
                                     profilePageViewModel.toggleShowUsernameChangeDialog(false)
                                 } else {
                                     profilePageViewModel.toggleErrorMessage("Usernames do not match")
@@ -253,23 +259,26 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                     Column {
                         OutlinedTextField(
                             value = profilePageViewModel.currentPassword,
-                            onValueChange = { profilePageViewModel.toggleCurrentPassword(it) },
+                            onValueChange = { profilePageViewModel.toggleCurrentPassword(it)},
                             label = { Text("Current Password", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation)
+                            textStyle = TextStyle(color = whitevariation),
+                            singleLine = true
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = profilePageViewModel.newPassword,
                             onValueChange = { profilePageViewModel.toggleNewPassword(it) },
                             label = { Text("New Password", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation)
+                            textStyle = TextStyle(color = whitevariation),
+                            singleLine = true
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
                             value = profilePageViewModel.verifyPassword,
-                            onValueChange = { profilePageViewModel.toggleVerifyPassword(it)},
+                            onValueChange = { profilePageViewModel.toggleVerifyPassword(it) },
                             label = { Text("Verify New Password", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation)
+                            textStyle = TextStyle(color = whitevariation),
+                            singleLine = true
                         )
                     }
                 },
@@ -282,6 +291,9 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                                         mainPageViewModel.dbManager?.changePassword(mainPageViewModel.userModel.username, profilePageViewModel.currentPassword, profilePageViewModel.newPassword)
                                     }
                                     mainPageViewModel.userModel.password = PasswordEncryption.hashPassword(profilePageViewModel.newPassword)
+                                    profilePageViewModel.toggleNewPassword("")
+                                    profilePageViewModel.toggleVerifyPassword("")
+                                    profilePageViewModel.toggleCurrentPassword("")
                                     profilePageViewModel.toggleShowPasswordDialog(false)
                                 } else {
                                     profilePageViewModel.toggleErrorMessage("Passwords do not match")

@@ -5,7 +5,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -14,10 +17,19 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +37,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.zIndex
 import model.ImageLoader
 import model.api.Book
 import model.api.BookApiClient
@@ -33,22 +48,10 @@ import org.example.viewmodel.MainPageViewModel
 import theme.*
 import view.BookView
 import view.HamburgerMenuView
-
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
-import androidx.compose.ui.zIndex
 import viewmodel.BookViewModel
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     val sortOptions =  listOf("Default","Title", "Author", "Recently Added")
@@ -61,6 +64,10 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
     var statusSelectedOptionText by remember { mutableStateOf(statusOptions[0])}
 
     var searchContent by remember {mutableStateOf("")}
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val searchFocusRequester = remember { FocusRequester() }
+
 
     MaterialTheme {
         Scaffold(
@@ -72,7 +79,17 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                             color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(end = 68.dp),
+                                .padding(end = 68.dp)
+                                .focusable(true)
+                                .onKeyEvent { event ->
+                                    if (event.isCtrlPressed && event.key == Key.K) {
+                                        println("Ctrl + K is pressed")
+                                        searchFocusRequester.requestFocus()
+                                        true
+                                    } else {
+                                        false
+                                    }
+                                },
                             textAlign = TextAlign.Center
                         )
                             },
@@ -93,6 +110,16 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                         .fillMaxSize()
                         .background(color = darkblue)
                         .padding(10.dp)
+                        .focusable(true)
+                        .onKeyEvent { event ->
+                            if (event.isCtrlPressed && event.key == Key.K) {
+                                println("Ctrl + K is pressed")
+                                searchFocusRequester.requestFocus()
+                                true
+                            } else {
+                                false
+                            }
+                    }
                 ) {
                     // Search Bar, Filters and Add Button
                     Row(
@@ -110,8 +137,8 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                         ) {
                             TextField(
                                 value = searchContent,
-                                onValueChange = {
-                                    searchContent = it
+                                onValueChange = { newValue : String ->
+                                    searchContent = newValue
                                     mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
                                 },
                                 leadingIcon = { Icon(
@@ -119,12 +146,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                     contentDescription = "searchIcon",
                                 )},
                                 placeholder = {Text("Search")},
-                                modifier = Modifier
-                                    .width(320.dp)
-                                    .height(50.dp)
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterVertically)
-                                    .weight(1.2f),
+
                                 shape = RoundedCornerShape(16.dp),
                                 colors = TextFieldDefaults.textFieldColors(
                                     backgroundColor = whitevariation,
@@ -134,7 +156,23 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                     placeholderColor = lightgrey,
                                     cursorColor = Color.Black,
                                 ),
-                                singleLine = true
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Next
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
+                                        keyboardController?.hide()
+                                    }
+                                ),
+                                modifier = Modifier
+                                    .width(320.dp)
+                                    .height(50.dp)
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .weight(1.2f)
+                                    .focusRequester(searchFocusRequester)
                             )
                             /*
                             SearchBar(
@@ -471,6 +509,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         onValueChange = { searchQuery = it },
                         label = { Text("Title", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
+                        singleLine = true,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             imeAction = ImeAction.Search
                         )
@@ -605,6 +644,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         },
                         label = { Text("Chapter", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
+                        singleLine = true,
                         modifier = Modifier
                             .widthIn(min = 200.dp, max = 240.dp)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -625,6 +665,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         },
                         label = { Text("Page", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
+                        singleLine = true,
                         modifier = Modifier
                             .widthIn(min = 200.dp, max = 240.dp)
                             .padding(horizontal = 16.dp, vertical = 8.dp)

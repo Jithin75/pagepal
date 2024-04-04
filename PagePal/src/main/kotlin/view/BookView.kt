@@ -396,6 +396,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
                         },
                         label = { Text("Chapter", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
+                        singleLine = true,
                         modifier = Modifier
                             .widthIn(min = 200.dp, max = 240.dp)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -416,6 +417,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
                         },
                         label = { Text("Page", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
+                        singleLine = true,
                         modifier = Modifier
                             .widthIn(min = 200.dp, max = 240.dp)
                             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -636,6 +638,7 @@ fun addWindow(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel
                         onValueChange = { chapter = it },
                         label = { Text("Chapter", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
+                        singleLine = true,
                         modifier = Modifier
                             .widthIn(min = 200.dp, max = 240.dp)
                             .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -648,6 +651,7 @@ fun addWindow(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel
                         onValueChange = { page = it },
                         label = { Text("Page", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
+                        singleLine = true,
                         modifier = Modifier
                             .widthIn(min = 200.dp, max = 240.dp)
                             .padding(horizontal = 16.dp, vertical = 8.dp),

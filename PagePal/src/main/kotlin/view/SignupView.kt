@@ -128,7 +128,8 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     value = username,
                     onValueChange = { username = it },
                     textStyle = TextStyle(color = whitevariation),
-                    label = { Text("Username", color = lightbrown) }
+                    label = { Text("Username", color = lightbrown) },
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -138,7 +139,8 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     onValueChange = { password = it },
                     label = { Text("Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -148,7 +150,8 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     onValueChange = { password_confirm = it },
                     label = { Text("Confirm Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
-                    visualTransformation = PasswordVisualTransformation()
+                    visualTransformation = PasswordVisualTransformation(),
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

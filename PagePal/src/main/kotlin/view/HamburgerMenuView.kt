@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import org.example.viewmodel.MainPageViewModel
 import theme.grey
 import theme.lightbrown
@@ -26,6 +27,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel, setCurrentState: (Lo
     Popup(
         alignment = Alignment.TopStart,
         onDismissRequest = {mainPageViewModel.onDismissHamburger()},
+        properties = PopupProperties(focusable = true),
         content = {
             Column(
                 modifier = Modifier
