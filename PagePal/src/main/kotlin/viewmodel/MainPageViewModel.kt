@@ -67,21 +67,26 @@ class MainPageViewModel (val userModel: UserModel,
         isAddBookOpen = false
     }
 
+    /*
     fun statusFilter(status: String) {
         if (status == "All") {
             displayedBooks = bookLibrary.toMutableList()
         } else {
             displayedBooks = bookLibrary.filter { it.status.contains(status, ignoreCase = true) }.toMutableList()
         }
-    }
+    }*/
 
-    fun sortFilter(sortType: String) {
-        if (sortType == "Default" || sortType == "Recently Added") {
-            displayedBooks = bookLibrary.toMutableList()
-        } else if (sortType == "Title") {
-            displayedBooks = bookLibrary.sortedBy { it.title }.toMutableList()
-        } else {
-            displayedBooks = bookLibrary.sortedBy { it.author }.toMutableList()
+    fun filter(sortType: String, status: String, searchValue: String) {
+        displayedBooks = when(sortType) {
+            "Title" -> bookLibrary.sortedBy { it.title }.toMutableList()
+            "Author" -> bookLibrary.sortedBy { it.author }.toMutableList()
+            else -> bookLibrary.toMutableList()
+        }
+        if (status != "All") {
+            displayedBooks = displayedBooks.filter { it.status.contains(status, ignoreCase = true) }.toMutableList()
+        }
+        if(searchValue.isNotBlank()) {
+            displayedBooks = displayedBooks.filter { it.title.contains(searchValue, ignoreCase = true) }.toMutableList()
         }
     }
 
@@ -101,13 +106,14 @@ class MainPageViewModel (val userModel: UserModel,
         displayedBooks.add(book)
     }
 
+    /*
     fun searchResults(searchValue: String) {
         if (searchValue.isNotBlank()) {
             displayedBooks = bookLibrary.filter { it.title.contains(searchValue, ignoreCase = true) }.toMutableList()
         } else {
             displayedBooks = bookLibrary.toMutableList() // Reset to original bookLibrary if search is empty
         }
-    }
+    }*/
 
     fun refreshDisplay() {
         displayedBooks = bookLibrary.toMutableList()

@@ -61,6 +61,8 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
     var statusExpanded by remember { mutableStateOf(false) }
     var statusSelectedOptionText by remember { mutableStateOf(statusOptions[0])}
 
+    var searchContent by remember {mutableStateOf("")}
+
     MaterialTheme {
         Scaffold(
             topBar = {
@@ -107,13 +109,42 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                         Row(
                             modifier = Modifier.weight(6f)
                         ) {
+                            TextField(
+                                value = searchContent,
+                                onValueChange = {
+                                    searchContent = it
+                                    mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
+                                },
+                                leadingIcon = { Icon(
+                                    Icons.Filled.Search,
+                                    contentDescription = "searchIcon",
+                                )},
+                                placeholder = {Text("Search")},
+                                modifier = Modifier
+                                    .width(320.dp)
+                                    .height(50.dp)
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .weight(1.2f),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = TextFieldDefaults.textFieldColors(
+                                    backgroundColor = whitevariation,
+                                    leadingIconColor = Color.Black,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent,
+                                    placeholderColor = lightgrey,
+                                    cursorColor = Color.Black,
+                                ),
+                                singleLine = true
+                            )
+                            /*
                             SearchBar(
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
                                     .align(Alignment.CenterVertically)
                                     .weight(1.2f),
                                 mainPageViewModel
-                            )
+                            )*/
                             /*
                             DropDown(
                                 listOf("Genre", "Horror", "Fantasy", "SciFi"),
@@ -153,7 +184,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                         DropdownMenuItem(
                                             onClick = {
                                                 statusSelectedOptionText = selectionOption
-                                                mainPageViewModel.statusFilter(selectionOption)
+                                                mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
                                                 statusExpanded = false
                                             }
                                         ) {
@@ -194,7 +225,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                         DropdownMenuItem(
                                             onClick = {
                                                 sortSelectedOptionText = selectionOption
-                                                mainPageViewModel.sortFilter(selectionOption)
+                                                mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
                                                 sortExpanded = false
                                             }
                                         ) {
@@ -259,6 +290,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
     }
 }
 
+/*
 @Composable
 fun SearchBar(modifier: Modifier, mainPageViewModel: MainPageViewModel){
     var searchContent by remember {mutableStateOf("")}
@@ -329,7 +361,7 @@ fun DropDown(options: List<String>, modifier: Modifier, onClick: (String) -> Uni
             }
         }
     }
-}
+}*/
 
 @Composable
 fun BookItem(book: BookModel, onClick: () -> Unit) {
