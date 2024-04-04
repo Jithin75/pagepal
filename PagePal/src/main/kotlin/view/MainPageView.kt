@@ -33,9 +33,6 @@ import org.example.viewmodel.MainPageViewModel
 import theme.*
 import view.BookView
 import view.HamburgerMenuView
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import model.api.*
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -45,12 +42,10 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
-import model.ImageLoader
 import viewmodel.BookViewModel
 
 
