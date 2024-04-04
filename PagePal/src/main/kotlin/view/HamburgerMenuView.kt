@@ -19,6 +19,7 @@ import theme.grey
 import theme.lightbrown
 import theme.whitevariation
 import viewmodel.ProfilePageViewModel
+import viewmodel.RecommendationViewModel
 
 @Composable
 fun HamburgerMenuView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
@@ -106,7 +107,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel, setCurrentState: (Lo
                 ProfilePageView(mainPageViewModel, ProfilePageViewModel(mainPageViewModel.userModel), setCurrentState)
             }
             if (mainPageViewModel.isRecommendOpen) {
-                RecommendationView(mainPageViewModel)
+                RecommendationView(mainPageViewModel, RecommendationViewModel())
             }
         }
     )
