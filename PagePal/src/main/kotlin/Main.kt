@@ -13,7 +13,6 @@ import androidx.compose.ui.window.application
 import com.mongodb.MongoClientSettings
 import com.mongodb.kotlin.client.coroutine.MongoClient
 import kotlinx.coroutines.runBlocking
-import org.bson.BsonValue
 import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.codecs.configuration.CodecRegistry
@@ -31,21 +30,7 @@ data class LoginViewState(val login: UserModel?, val view: String)
 
 @Composable
 fun App(currentView: MutableState<String>) {
-    /*var library: MutableList<BookModel> = mutableListOf()
-    runBlocking {
-        library.add(BookModel("La Bete humaine", "Guy de Maupassant", "laBeteHumaine.jpg"))
-        library.add(BookModel("Voyage au Centre de la Terre", "Jules Verne"))
-        library.add(BookModel("I, Robot", "Isaac Asimov", "IRobot.jpg"))
-        library.add(BookModel("Murder on the Orient Express", "Agatha Christie", "murderOrientExpress.jpg"))
-        library.add(BookModel("Le Rhin", "Victor Hugo"))
-        library.add(BookModel("La Metamorphose", "Franz Kafka", "laMetamorphose.jpg"))
-        library.add(BookModel("L'Etranger", "Albert Camus", "lEtranger.jpg"))
-        library.add(BookModel("L'Avare", "Moliere"))
-        library.add(BookModel("The Recruit", "Robert Muchamore", "theRecruit.jpg"))
-    }
-    val user = UserModel("Achille59", "complicatedPassw0rd", library)
-    */
-    var library: MutableList<BsonValue> = mutableListOf()
+    var library: MutableList<String> = mutableListOf()
     var bookLibrary : MutableList<BookModel> = mutableListOf()
     val pojoCodecRegistry: CodecRegistry = fromRegistries(
         MongoClientSettings.getDefaultCodecRegistry(),
@@ -55,13 +40,7 @@ fun App(currentView: MutableState<String>) {
     val client = MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
     val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry);
     val dbManager = DatabaseManager(database)
-    runBlocking {
-        // Temporary, will be removed once the login authorization is fully functional
-        val book = BookModel("Les Miserables", "Victor Hugo", "coverNotAvailable.png", description = "Set in the Parisian underworld and plotted like a detective story, the work follows Jean Valjean, a victim of society who has been imprisoned for 19 years for stealing a loaf of bread. A hardened criminal upon his release, he eventually reforms, becoming a successful industrialist and mayor of a northern town. Despite this he is haunted by an impulsive, regretted former crime and is pursued relentlessly by the police inspector Javert. Valjean eventually gives himself up for the sake of his adopted daughter, Cosette, and her husband, Marius. 'Les Miserables' is a vast panorama of Parisian society and its underworld, and it contains many famous episodes and passages.")
-        val bookid = dbManager.addBook(book)
-        library.add(bookid)
-        bookLibrary.add(book)
-    }
+
     val user = UserModel("Achille59", "complicatedPassw0rd", library )
 
     val mainPageViewModel = remember { MainPageViewModel(user, bookLibrary, dbManager) }

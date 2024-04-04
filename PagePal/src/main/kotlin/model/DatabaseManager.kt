@@ -15,14 +15,14 @@ class DatabaseManager(private val database: MongoDatabase) {
     private val userCollection: MongoCollection<UserModel> = database.getCollection("UserCollection")
     private val bookCollection: MongoCollection<BookModel> = database.getCollection("BookCollection")
 
-    suspend fun addBook(book: BookModel): BsonValue {
+    suspend fun addBook(book: BookModel): String {
         var bookId: BsonValue
         book.bookId = ObjectId().toHexString()
         bookCollection.insertOne(book).also {
             println("Inserted Book - ${it.insertedId}")
             bookId = it.insertedId
         }
-        return bookId
+        return book.bookId
     }
 
     suspend fun addUser(user: UserModel) {
@@ -42,18 +42,24 @@ class DatabaseManager(private val database: MongoDatabase) {
         }
     }
 
-    suspend fun updateUserBookList(username: String, newBook: BsonValue) {
+    suspend fun updateUserBookList(username: String, newBook: String) {
         val filter: Bson = Filters.eq(UserModel::username.name, username)
         val update = Updates.addToSet(UserModel::library.name, newBook)
         val result = userCollection.updateOne(filter, update)
         println("Matched docs ${result.matchedCount} and updated docs ${result.modifiedCount}")
     }
 
-    suspend fun removeBookFromUser(username: String, bookToRemove: BsonValue) {
+    suspend fun removeBookFromUser(username: String, bookToRemove: String) {
         val filter: Bson = Filters.eq(UserModel::username.name, username)
         val update = Updates.pull(UserModel::library.name, bookToRemove)
         val result = userCollection.updateOne(filter, update)
         println("Matched docs ${result.matchedCount} and updated docs ${result.modifiedCount}")
+    }
+
+    suspend fun removeBook(bookId: String) {
+        val filter = Filters.eq("bookId", bookId)
+        val result = bookCollection.deleteOne(filter)
+        println("Deleted ${result.deletedCount} document(s) from BookCollection")
     }
 
     suspend fun deleteUser(username: String) {
@@ -101,8 +107,8 @@ class DatabaseManager(private val database: MongoDatabase) {
         return user != null && PasswordEncryption.verifyPassword(password, user.password)
     }
 
-    suspend fun getBookById(bookId: BsonValue): BookModel? {
-        return bookCollection.find(Filters.eq("_id", bookId)).firstOrNull()
+    suspend fun getBookById(bookId: String): BookModel? {
+        return bookCollection.find(Filters.eq("bookId", bookId)).firstOrNull()
     }
 
     suspend fun getUserLibraryDB(user: UserModel): MutableList<BookModel> {

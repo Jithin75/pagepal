@@ -8,7 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,48 +17,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
 import kotlinx.coroutines.runBlocking
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
-import org.example.model.DatabaseManager
 import org.example.model.PasswordEncryption
 import org.example.viewmodel.MainPageViewModel
 import theme.darkblue
 import theme.grey
 import theme.lightbrown
 import theme.whitevariation
+import viewmodel.ProfilePageViewModel
 
 @Composable
-fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
-
-    var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
-    var currentPassword by remember { mutableStateOf("") }
-    var newPassword by remember { mutableStateOf("") }
-    var verifyPassword by remember { mutableStateOf("") }
-    var showPasswordDialog by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-    var showConfirmationDialog by remember { mutableStateOf(false) }
-    var newUsername by remember { mutableStateOf("") }
-    var verifyUsername by remember { mutableStateOf("") }
-    var showUsernameChangeDialog by remember { mutableStateOf(false) }
-
-
-    LaunchedEffect(Unit) {
-        dbManager = runBlocking {
-            val pojoCodecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
-                MongoClientSettings.getDefaultCodecRegistry(),
-                CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-            )
-            val client =
-                MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
-            val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry)
-            DatabaseManager(database)
-        }
-    }
-
+fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: ProfilePageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     MaterialTheme {
         Scaffold (
             topBar = {
@@ -120,7 +89,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                     // Settings Options
                     Button(
                         onClick = {
-                            showPasswordDialog = true
+                            profilePageViewModel.toggleShowPasswordDialog(true)
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = lightbrown,
@@ -134,7 +103,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
 
                     Button(
                         onClick = {
-                            showUsernameChangeDialog = true;
+                            profilePageViewModel.toggleShowUsernameChangeDialog(true)
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = lightbrown,
@@ -148,7 +117,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
 
                     Button(
                         onClick = {
-                            showConfirmationDialog = true;
+                            profilePageViewModel.toggleShowConfirmationDialog(true)
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = lightbrown,
@@ -160,9 +129,9 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 }
             }
         )
-        if (showConfirmationDialog) {
+        if (profilePageViewModel.isShowConfirmationDialog()) {
             AlertDialog(
-                onDismissRequest = { showConfirmationDialog = false },
+                onDismissRequest = { profilePageViewModel.toggleShowConfirmationDialog(false)},
                 title = {
                     Text(
                         text = "Delete Account",
@@ -180,9 +149,9 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                     Button(
                         onClick = {
                             runBlocking {
-                                dbManager?.deleteUser(mainPageViewModel.userModel.username)
+                                mainPageViewModel.dbManager?.deleteUser(mainPageViewModel.userModel.username)
                             }
-                            showConfirmationDialog = false
+                            profilePageViewModel.toggleShowConfirmationDialog(false)
                             setCurrentState(LoginViewState(null, "login"))
                         }
                     ) {
@@ -191,7 +160,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 },
                 dismissButton = {
                     Button(
-                        onClick = { showConfirmationDialog = false }
+                        onClick = { profilePageViewModel.toggleShowConfirmationDialog(false)}
                     ) {
                         Text("No")
                     }
@@ -199,9 +168,9 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 backgroundColor = darkblue
             )
         }
-        if (showUsernameChangeDialog) {
+        if (profilePageViewModel.isShowUsernameChangeDialog()) {
             AlertDialog(
-                onDismissRequest = { showUsernameChangeDialog = false },
+                onDismissRequest = { profilePageViewModel.toggleShowUsernameChangeDialog(false) },
                 title = {
                     Row(
                         modifier = Modifier
@@ -217,15 +186,15 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 text = {
                     Column {
                         OutlinedTextField(
-                            value = newUsername,
-                            onValueChange = { newUsername = it },
+                            value = profilePageViewModel.newUsername,
+                            onValueChange = { profilePageViewModel.toggleNewUsername(it) },
                             label = { Text("New Username", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
-                            value = verifyUsername,
-                            onValueChange = { verifyUsername = it },
+                            value = profilePageViewModel.verifyUsername,
+                            onValueChange = { profilePageViewModel.toggleVerifyUsername(it) },
                             label = { Text("Verify New Username", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation)
                         )
@@ -235,20 +204,20 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                     Button(
                         onClick = {
                             val userExist = runBlocking {
-                                dbManager?.getUserByUsername(newUsername)
+                                mainPageViewModel.dbManager?.getUserByUsername(profilePageViewModel.newUsername)
                             }
                             if (userExist == null) {
-                                if (newUsername == verifyUsername) {
+                                if (profilePageViewModel.newUsername == profilePageViewModel.verifyUsername) {
                                     runBlocking {
-                                        dbManager?.updateUsername(mainPageViewModel.userModel.username, newUsername)
+                                        mainPageViewModel.dbManager?.updateUsername(mainPageViewModel.userModel.username, profilePageViewModel.newUsername)
                                     }
-                                    mainPageViewModel.userModel.username = newUsername
-                                    showUsernameChangeDialog = false
+                                    mainPageViewModel.userModel.username = profilePageViewModel.newUsername
+                                    profilePageViewModel.toggleShowUsernameChangeDialog(false)
                                 } else {
-                                    errorMessage = "Usernames do not match"
+                                    profilePageViewModel.toggleErrorMessage("Usernames do not match")
                                 }
                             } else {
-                                errorMessage = "Username already taken"
+                                profilePageViewModel.toggleErrorMessage("Username already taken")
                             }
                         }
                     ) {
@@ -257,7 +226,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 },
                 dismissButton = {
                     Button(
-                        onClick = { showUsernameChangeDialog = false }
+                        onClick = { profilePageViewModel.toggleShowUsernameChangeDialog(false)}
                     ) {
                         Text(text = "Cancel")
                     }
@@ -265,9 +234,9 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 backgroundColor = darkblue
             )
         }
-        if (showPasswordDialog) {
+        if (profilePageViewModel.isShowPasswordDialog()) {
             AlertDialog(
-                onDismissRequest = { showPasswordDialog = false },
+                onDismissRequest = { profilePageViewModel.toggleShowPasswordDialog(false) },
                 title = {
                     Row(
                         modifier = Modifier
@@ -283,22 +252,22 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 text = {
                     Column {
                         OutlinedTextField(
-                            value = currentPassword,
-                            onValueChange = { currentPassword = it },
+                            value = profilePageViewModel.currentPassword,
+                            onValueChange = { profilePageViewModel.toggleCurrentPassword(it) },
                             label = { Text("Current Password", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
-                            value = newPassword,
-                            onValueChange = { newPassword = it },
+                            value = profilePageViewModel.newPassword,
+                            onValueChange = { profilePageViewModel.toggleNewPassword(it) },
                             label = { Text("New Password", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
-                            value = verifyPassword,
-                            onValueChange = { verifyPassword = it },
+                            value = profilePageViewModel.verifyPassword,
+                            onValueChange = { profilePageViewModel.toggleVerifyPassword(it)},
                             label = { Text("Verify New Password", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation)
                         )
@@ -307,18 +276,18 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 confirmButton = {
                     Button(
                         onClick = {
-                            if (PasswordEncryption.verifyPassword(currentPassword, mainPageViewModel.userModel.password)) {
-                                if (newPassword == verifyPassword) {
+                            if (PasswordEncryption.verifyPassword(profilePageViewModel.currentPassword, mainPageViewModel.userModel.password)) {
+                                if (profilePageViewModel.newPassword == profilePageViewModel.verifyPassword) {
                                     runBlocking {
-                                        dbManager?.changePassword(mainPageViewModel.userModel.username, currentPassword, newPassword)
+                                        mainPageViewModel.dbManager?.changePassword(mainPageViewModel.userModel.username, profilePageViewModel.currentPassword, profilePageViewModel.newPassword)
                                     }
-                                    mainPageViewModel.userModel.password = PasswordEncryption.hashPassword(newPassword)
-                                    showPasswordDialog = false
+                                    mainPageViewModel.userModel.password = PasswordEncryption.hashPassword(profilePageViewModel.newPassword)
+                                    profilePageViewModel.toggleShowPasswordDialog(false)
                                 } else {
-                                    errorMessage = "Passwords do not match"
+                                    profilePageViewModel.toggleErrorMessage("Passwords do not match")
                                 }
                             } else {
-                                errorMessage = "Incorrect current password"
+                                profilePageViewModel.toggleErrorMessage("Incorrect current password")
                             }
                         }
                     ) {
@@ -327,7 +296,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 },
                 dismissButton = {
                     Button(
-                        onClick = { showPasswordDialog = false }
+                        onClick = { profilePageViewModel.toggleShowPasswordDialog(false) }
                     ) {
                         Text(text = "Cancel")
                     }
@@ -335,9 +304,9 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 backgroundColor = darkblue
             )
         }
-        if (errorMessage.isNotEmpty()) {
+        if (profilePageViewModel.errorMessage.isNotEmpty()) {
             AlertDialog(
-                onDismissRequest = { errorMessage = "" },
+                onDismissRequest = { profilePageViewModel.toggleErrorMessage("") },
                 title = {
                     Text(
                         text = "Error",
@@ -346,13 +315,13 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, setCurrentState: (Logi
                 },
                 text = {
                     Text(
-                        text = errorMessage,
+                        text = profilePageViewModel.errorMessage,
                         color = Color.White
                     )
                 },
                 confirmButton = {
                     Button(
-                        onClick = { errorMessage = "" }
+                        onClick = { profilePageViewModel.toggleErrorMessage("")}
                     ) {
                         Text(text = "OK")
                     }

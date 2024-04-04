@@ -3,27 +3,15 @@ package viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
 import kotlinx.coroutines.runBlocking
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.BookModel
 import org.example.model.DatabaseManager
 
-class BookViewModel (val bookModel: BookModel){
-
-    val pojoCodecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
-        MongoClientSettings.getDefaultCodecRegistry(),
-        CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-    )
-
-    val client = MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
-    val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry);
-    val dbManager = DatabaseManager(database)
-
+class BookViewModel (val bookModel: BookModel, val dbManager: DatabaseManager){
     var isEditOpen by mutableStateOf(false)
+        private set
+
+    var showConfirmationDialog by mutableStateOf(false)
         private set
 
     fun onEditClick() {
@@ -81,5 +69,18 @@ class BookViewModel (val bookModel: BookModel){
         runBlocking {
             dbManager.setBookPage(bookModel, page)
         }
+    }
+
+    fun deleteBook(username: String) {
+        runBlocking {
+            dbManager.removeBookFromUser(username, bookModel.bookId)
+            dbManager.removeBook(bookModel.bookId)
+        }
+    }
+    fun toggleShowConfirmationDialog(bool : Boolean) {
+        showConfirmationDialog = bool
+    }
+    fun isShowConfirmationDialog() : Boolean {
+        return showConfirmationDialog
     }
 }

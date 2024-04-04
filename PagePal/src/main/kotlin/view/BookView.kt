@@ -1,7 +1,6 @@
 package view
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -255,7 +254,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
                     }
                 }
                 if(bookViewModel.isEditOpen) {
-                    editWindow(bookViewModel)
+                    editWindow(bookViewModel, mainPageViewModel)
                 }
             }
         )
@@ -263,7 +262,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel)
 }
 
 @Composable
-fun editWindow(bookViewModel: BookViewModel) {
+fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewModel) {
     var selectedStatus by remember {mutableStateOf(bookViewModel.getStatus())}
     var chapter by remember { mutableStateOf(bookViewModel.getChapter()) }
     var page by remember { mutableStateOf(bookViewModel.getPage()) }
@@ -392,7 +391,9 @@ fun editWindow(bookViewModel: BookViewModel) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = {/* Delete book functionality */},
+                        onClick = {
+                            bookViewModel.toggleShowConfirmationDialog(true)
+                        },
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = Color.Red,
@@ -401,6 +402,47 @@ fun editWindow(bookViewModel: BookViewModel) {
                     ) {
                         Text("DELETE")
                     }
+                }
+                if (bookViewModel.isShowConfirmationDialog()) {
+                    AlertDialog(
+                        onDismissRequest = { bookViewModel.toggleShowConfirmationDialog(false)},
+                        title = {
+                            Text(
+                                text = "Remove Book",
+                                color = Color.White,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Are you sure you want to remove this book from your collection?",
+                                color = Color.White
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    bookViewModel.deleteBook(mainPageViewModel.userModel.username)
+                                    mainPageViewModel.bookLibrary.removeIf { it.bookId == bookViewModel.bookModel.bookId }
+                                    mainPageViewModel.userModel.library.remove(bookViewModel.bookModel.bookId)
+                                    mainPageViewModel.refreshDisplay()
+                                    bookViewModel.onDismissEdit()
+                                    mainPageViewModel.onDismissBook()
+                                    bookViewModel.toggleShowConfirmationDialog(false)
+                                }
+                            ) {
+                                Text("Yes")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = { bookViewModel.toggleShowConfirmationDialog(false)}
+                            ) {
+                                Text("No")
+                            }
+                        },
+                        backgroundColor = darkblue
+                    )
                 }
 
                 Row(
