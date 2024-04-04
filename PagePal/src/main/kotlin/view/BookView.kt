@@ -30,7 +30,7 @@ import viewmodel.BookViewModel
 
 
 @Composable
-fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, isRecommended: Boolean = false){
+fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, isRecommended: Boolean = false, onDismiss: () -> Unit){
     val imageLoader = ImageLoader()
     MaterialTheme{
         Scaffold (
@@ -48,7 +48,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel,
                     },
                     backgroundColor = grey,
                     navigationIcon = {
-                        IconButton(onClick = {mainPageViewModel.onDismissBook()}) {
+                        IconButton(onClick = onDismiss) {
                             Icon(
                                 Icons.Filled.ArrowBack,
                                 contentDescription = "Back",
@@ -186,81 +186,83 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel,
                                 )
                             }
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 30.dp),
-                            ) {
-                                Text(
-                                    text = "STATUS:",
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = whitevariation
-                                    ),
-                                    textAlign = TextAlign.Left
-                                )
-
-                                val status = bookViewModel.getStatus()
-                                Text(
-                                    text = status,
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp,
-                                        color = when(status) {
-                                            "New" -> green
-                                            "In Progress" -> Color.Yellow
-                                            "Completed" -> Color.Red
-                                            else -> lightbrown
-                                        }
-                                    ),
-                                    textAlign = TextAlign.Left,
-                                    modifier = Modifier.padding(start = 10.dp)
-                                )
-                                if(status == "In Progress") {
+                            if(!isRecommended) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 30.dp),
+                                ) {
                                     Text(
-                                        text = "CHAPTER:",
+                                        text = "STATUS:",
                                         style = TextStyle(
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 18.sp,
                                             color = whitevariation
                                         ),
-                                        textAlign = TextAlign.Left,
-                                        modifier = Modifier.padding(start = 30.dp)
+                                        textAlign = TextAlign.Left
                                     )
 
+                                    val status = bookViewModel.getStatus()
                                     Text(
-                                        text = bookViewModel.getChapter(),
+                                        text = status,
                                         style = TextStyle(
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 18.sp,
-                                            color = green // Change color to green
+                                            color = when (status) {
+                                                "New" -> green
+                                                "In Progress" -> Color.Yellow
+                                                "Completed" -> Color.Red
+                                                else -> lightbrown
+                                            }
                                         ),
                                         textAlign = TextAlign.Left,
                                         modifier = Modifier.padding(start = 10.dp)
                                     )
+                                    if (status == "In Progress") {
+                                        Text(
+                                            text = "CHAPTER:",
+                                            style = TextStyle(
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 18.sp,
+                                                color = whitevariation
+                                            ),
+                                            textAlign = TextAlign.Left,
+                                            modifier = Modifier.padding(start = 30.dp)
+                                        )
 
-                                    Text(
-                                        text = "PAGE:",
-                                        style = TextStyle(
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 18.sp,
-                                            color = whitevariation
-                                        ),
-                                        textAlign = TextAlign.Left,
-                                        modifier = Modifier.padding(start = 30.dp)
-                                    )
+                                        Text(
+                                            text = bookViewModel.getChapter(),
+                                            style = TextStyle(
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 18.sp,
+                                                color = green // Change color to green
+                                            ),
+                                            textAlign = TextAlign.Left,
+                                            modifier = Modifier.padding(start = 10.dp)
+                                        )
 
-                                    Text(
-                                        text = bookViewModel.getPage(),
-                                        style = TextStyle(
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 18.sp,
-                                            color = green // Change color to green
-                                        ),
-                                        textAlign = TextAlign.Left,
-                                        modifier = Modifier.padding(start = 10.dp)
-                                    )
+                                        Text(
+                                            text = "PAGE:",
+                                            style = TextStyle(
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 18.sp,
+                                                color = whitevariation
+                                            ),
+                                            textAlign = TextAlign.Left,
+                                            modifier = Modifier.padding(start = 30.dp)
+                                        )
+
+                                        Text(
+                                            text = bookViewModel.getPage(),
+                                            style = TextStyle(
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 18.sp,
+                                                color = green // Change color to green
+                                            ),
+                                            textAlign = TextAlign.Left,
+                                            modifier = Modifier.padding(start = 10.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -270,7 +272,7 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel,
                     editWindow(bookViewModel, mainPageViewModel)
                 }
                 if(bookViewModel.isAddOpen) {
-                    addWindow(bookViewModel)
+                    addWindow(mainPageViewModel, bookViewModel, onDismiss)
                 }
             }
         )
@@ -524,7 +526,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
 }
 
 @Composable
-fun addWindow(bookViewModel: BookViewModel) {
+fun addWindow(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, onDismiss: () -> Unit) {
     var selectedStatus by remember {mutableStateOf("New")}
     var chapter by remember { mutableStateOf(bookViewModel.getChapter()) }
     var page by remember { mutableStateOf(bookViewModel.getPage()) }
@@ -532,7 +534,7 @@ fun addWindow(bookViewModel: BookViewModel) {
 
     Popup (
         alignment = Alignment.Center,
-        onDismissRequest = {bookViewModel.onDismissAdd()},
+        onDismissRequest = onDismiss,
         properties = PopupProperties(focusable = true),
         content = {
             Column(
@@ -674,7 +676,14 @@ fun addWindow(bookViewModel: BookViewModel) {
                     Spacer(modifier = Modifier.width(96.dp))
 
                     OutlinedButton(
-                        onClick = {/* Add Book Functionality */},
+                        onClick = {
+                            val book = bookViewModel.bookModel
+                            book.page = page
+                            book.chapter = chapter
+                            book.status = selectedStatus
+                            mainPageViewModel.addBook(book)
+                            onDismiss()
+                        },
                         modifier = Modifier.width(120.dp),
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(1.dp, lightbrown),

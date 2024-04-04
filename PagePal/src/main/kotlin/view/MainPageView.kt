@@ -279,12 +279,11 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                 if (mainPageViewModel.isAddBookOpen) {
                     addBookWindow(mainPageViewModel)
                 }
-
             }
         )
         if(mainPageViewModel.isBookOpen) {
             val bookModel = mainPageViewModel.bookOpened ?: BookModel(title = "error")
-            BookView(mainPageViewModel, BookViewModel(bookModel, mainPageViewModel.dbManager))
+            BookView(mainPageViewModel, BookViewModel(bookModel, mainPageViewModel.dbManager), onDismiss = {mainPageViewModel.onDismissBook()})
         }
     }
 }
