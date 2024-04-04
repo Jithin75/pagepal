@@ -21,7 +21,7 @@ class AIRecommender {
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are a book recommender. I need you to recommend $num books based on what the user has previously read. The user's reading preferences include novels, comics, and mangas. Your response should be in JSON format (the output message must start with { and end with } ), with each entry containing the book's title followed by the author. For example: {\"recommendations\":[{\"title\": \"Book Title\", \"author\": \"Author Name\"}, {\"title\": \"Book Title\", \"author\": \"Author Name\"}]}. Ensure that all recommended books are new and relevant to the user's reading preferences, considering the similarity of genres and types of books the user has previously read."
+                        "content": "You are a book recommender. I need you to recommend $num books based on what the user has previously read. The user's reading preferences include novels, comics, and mangas. Your response should be in JSON format (the output message must start with \"{\" and end with \"}\" ), with each entry containing the book's title followed by the author. For example: {\"recommendations\":[{\"title\": \"Book Title\", \"author\": \"Author Name\"}, {\"title\": \"Book Title\", \"author\": \"Author Name\"}]}. Ensure that all recommended books are new and relevant to the user's reading preferences, do not suggest books the user has previously read, considering the similarity of genres and types of books the user has previously read."
                     },
                     {
                         "role": "user",
@@ -40,31 +40,20 @@ class AIRecommender {
                 .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
                 .build()
 
-//            client.newCall(request).enqueue(object : Callback {
-//                override fun onFailure(call: Call, e: IOException) {
-//                    print("error: API FAILED")
-//                }
-//
-//                override fun onResponse(call: Call, response: Response) {
-//                    val body = response.body?.string()
-//                    if (body != null) {
-//                        print(body)
-//                    } else {
-//                        print("body: empty")
-//                    }
-//                    val jsonObject = JSONObject(body)
-//                    val jsonArray: JSONArray = jsonObject.getJSONArray("choices")
-//                    val messageObject = jsonArray.getJSONObject(0).getJSONObject("message")
-//                    return messageObject.getString("content")
-//                }
-//            })
             val response = client.newCall(request).execute()
             val body = response.body?.string()
 
-            val jsonObject = JSONObject(body)
-            val jsonArray: JSONArray = jsonObject.getJSONArray("choices")
-            val messageObject = jsonArray.getJSONObject(0).getJSONObject("message")
-            return messageObject.getString("content")
+            try {
+                val jsonObject = JSONObject(body)
+                val jsonArray: JSONArray = jsonObject.getJSONArray("choices")
+                val messageObject = jsonArray.getJSONObject(0).getJSONObject("message")
+                return messageObject.getString("content")
+            } catch (e: Exception) {
+                println("Exception: $e")
+                println("Body of HTTP response :\n$body")
+                println("Question passed: \n$question")
+                return "PARSE ERROR"
+            }
         }
     }
 }

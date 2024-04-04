@@ -60,7 +60,9 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
 
             userBooks.forEachIndexed { index, book ->
                 // Append the title and authors to the question string
-                question.append("${book.title}: ${book.author}")
+                val strippedTitle = book.title.replace("\"", "\\\"")
+                val strippedAuthor = book.author.replace("\"", "\\\"")
+                question.append("$strippedTitle: $strippedAuthor")
 
                 // Append newline character except for the last book
                 if (index < userBooks.size - 1) {
@@ -71,6 +73,9 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
             displayedBooks = mutableListOf<BookModel>()
             // Pass the constructed question string to the getResponse function
             val response = AIRecommender.getResponse(question.toString(), 10)
+            if (response == "PARSE ERROR") {
+                mainPageViewModel.onDismissRecommend()
+            }
             val jsonObject = JSONObject(response)
             val jsonArray: JSONArray = jsonObject.getJSONArray("recommendations")
             val bookTitles = mutableListOf<String>()
