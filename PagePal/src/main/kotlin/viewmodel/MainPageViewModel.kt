@@ -37,8 +37,13 @@ class MainPageViewModel (val userModel: UserModel,
         isProfileOpen = !isProfileOpen
     }
 
-    fun toggleRecommendPage() {
-        isRecommendOpen = !isRecommendOpen
+    fun onRecommendPageClick() {
+        isRecommendOpen = true
+    }
+
+    fun onDismissRecommend() {
+        isRecommendOpen = false
+        isHamburgerOpen = false
     }
 
     fun onBookClick(bookModel: BookModel) {

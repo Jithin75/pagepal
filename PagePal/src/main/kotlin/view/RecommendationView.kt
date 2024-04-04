@@ -101,29 +101,57 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
     }
 
     MaterialTheme {
-        // Show loading screen while data is being fetched
-        if (isLoading) {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = "PagePal",
-                                color = Color.White,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = 68.dp),
-                                textAlign = TextAlign.Center
+        Scaffold (
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "PagePal",
+                            color = Color.White,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 68.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    },
+                    backgroundColor = grey,
+                    navigationIcon = {
+                        IconButton(onClick = {mainPageViewModel.onDismissRecommend()}) {
+                            Icon(
+                                Icons.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = Color.White
                             )
-                        },
-                        backgroundColor = grey,
-                        navigationIcon = {
-                            IconButton(onClick = { mainPageViewModel.toggleRecommendPage() }) {
-                                Icon(
-                                    Icons.Filled.ArrowBack,
-                                    contentDescription = "Back",
-                                    tint = Color.White
-                                )
+                        }
+                    }
+                )
+            },
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = darkblue)
+                        .padding(10.dp)
+                ) {
+                    // Book Grid
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(5),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        val userBooks = mainPageViewModel.getUserLibrary()
+
+                        val question = StringBuilder()
+                        question.append("The user has read the following books: \\n")
+
+                        userBooks.forEachIndexed { index, book ->
+                            // Append the title and authors to the question string
+                            question.append("${book.title}: ${book.author}")
+
+                            // Append newline character except for the last book
+                            if (index < userBooks.size - 1) {
+                                question.append("\\n")
                             }
                         }
                     )
