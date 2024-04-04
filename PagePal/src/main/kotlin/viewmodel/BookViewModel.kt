@@ -26,12 +26,23 @@ class BookViewModel (val bookModel: BookModel){
     var isEditOpen by mutableStateOf(false)
         private set
 
+    var isAddOpen by mutableStateOf(false)
+        private set
+
     fun onEditClick() {
         isEditOpen = true
     }
 
     fun onDismissEdit() {
         isEditOpen = false
+    }
+
+    fun onAddClick() {
+        isAddOpen = true
+    }
+
+    fun onDismissAdd() {
+        isAddOpen = false
     }
 
     fun getCover(): String {
