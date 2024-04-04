@@ -68,7 +68,7 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
                     },
                     backgroundColor = grey,
                     navigationIcon = {
-                        IconButton(onClick = {mainPageViewModel.toggleRecommendPage()}) {
+                        IconButton(onClick = {mainPageViewModel.onDismissRecommend()}) {
                             Icon(
                                 Icons.Filled.ArrowBack,
                                 contentDescription = "Back",
@@ -92,7 +92,7 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        var userBooks = mainPageViewModel.getUserLibrary()
+                        val userBooks = mainPageViewModel.getUserLibrary()
 
                         val question = StringBuilder()
                         question.append("The user has read the following books: \\n")

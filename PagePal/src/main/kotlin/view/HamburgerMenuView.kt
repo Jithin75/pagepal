@@ -76,7 +76,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel, setCurrentState: (Lo
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clickable(onClick = {mainPageViewModel.toggleRecommendPage()})
+                        .clickable(onClick = {mainPageViewModel.onRecommendPageClick()})
                         .fillMaxWidth()
                         .height(48.dp)
 
