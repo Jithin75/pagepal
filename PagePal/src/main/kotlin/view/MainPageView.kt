@@ -260,7 +260,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                             .weight(1f)
                     ) {
                         val library = displayedBooks.toList()
-                        items(items = library, key = { it.title }) { book : BookModel ->
+                        items(items = library, key = { it.bookId }) { book : BookModel ->
                             BookItem(
                                 book,
                                 onClick = {mainPageViewModel.onBookClick(book)}
@@ -662,10 +662,14 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         onClick = {
                             if (selectedBook != null) {
                                 val bookInfo = selectedBook
+                                val pattern = Regex("&zoom=\\d+")
+                                val replacement = "&zoom=3"
+                                var cover = bookInfo!!.img
+                                cover = cover.replace(pattern, replacement)
                                 val book = BookModel(
-                                    title = bookInfo!!.title,
+                                    title = bookInfo.title,
                                     author = bookInfo.authors,
-                                    cover = bookInfo.img,
+                                    cover = cover,
                                     publisher = bookInfo.publisher,
                                     publishYear = bookInfo.publishYear,
                                     description = bookInfo.description,
