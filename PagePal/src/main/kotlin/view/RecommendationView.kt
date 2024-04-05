@@ -37,11 +37,13 @@ import viewmodel.RecommendationViewModel
 
 @Composable
 fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewModel: RecommendationViewModel) {
-    var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
-    var isLoading by remember { mutableStateOf(true) } // State for loading
-    var displayedBooks by remember { mutableStateOf<List<BookModel>>(emptyList()) }
+    //var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
+    //var isLoading by remember { mutableStateOf(true) } // State for loading
+    //var displayedBooks by remember { mutableStateOf<List<BookModel>>(emptyList()) }
 
     LaunchedEffect(Unit) {
+        recommendationViewModel.initiateDisplayedBooks(mainPageViewModel)
+        /*
         dbManager = runBlocking {
             val pojoCodecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
                 MongoClientSettings.getDefaultCodecRegistry(),
@@ -102,12 +104,12 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
             println(e)
         } finally {
             isLoading = false // Hide loading screen when tasks complete
-        }
+        }*/
     }
 
     MaterialTheme {
         // Show loading screen while data is being fetched
-        if (isLoading) {
+        if (recommendationViewModel.isLoading) {
             Scaffold(
                 topBar = {
                     TopAppBar(
@@ -191,8 +193,8 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
                         ) {
 
                             // Update displayedBooks within the composable context
-                            val library = displayedBooks.toList()
-                            items(items = library, key = { it.cover }) { book ->
+                            val library = recommendationViewModel.displayedBooks.toList()
+                            items(items = library, key = { it.title + it.cover }) { book ->
                                 BookItem(
                                     book,
                                     onClick = { recommendationViewModel.onBookClick(book) }
