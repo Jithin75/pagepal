@@ -81,4 +81,11 @@ class RecommendationViewModel () {
         isBookOpen = false
         bookOpened = null
     }
+
+    fun onBookAdded() {
+        displayedBooks = displayedBooks.minus(bookOpened!!)
+        isBookOpen = false
+        bookOpened = null
+    }
+
 }

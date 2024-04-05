@@ -27,10 +27,11 @@ import model.ImageLoader
 import org.example.viewmodel.MainPageViewModel
 import theme.*
 import viewmodel.BookViewModel
+import viewmodel.RecommendationViewModel
 
 
 @Composable
-fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, isRecommended: Boolean = false, onDismiss: () -> Unit){
+fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, recommendationViewModel: RecommendationViewModel? = null, isRecommended: Boolean = false){
     val imageLoader = ImageLoader()
     MaterialTheme{
         Scaffold (
@@ -48,7 +49,17 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel,
                     },
                     backgroundColor = grey,
                     navigationIcon = {
-                        IconButton(onClick = onDismiss) {
+                        IconButton(onClick = {
+                            if(!isRecommended) {
+                                mainPageViewModel.onDismissBook()
+                            } else {
+                                if(recommendationViewModel != null) {
+                                    recommendationViewModel.onDismissBook()
+                                } else {
+                                    print("Error: recommendationViewModel not provided")
+                                }
+                            }
+                        }) {
                             Icon(
                                 Icons.Filled.ArrowBack,
                                 contentDescription = "Back",
@@ -272,7 +283,11 @@ fun BookView(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel,
                     editWindow(bookViewModel, mainPageViewModel)
                 }
                 if(bookViewModel.isAddOpen) {
-                    addWindow(mainPageViewModel, bookViewModel, onDismiss)
+                    if(recommendationViewModel != null) {
+                        addWindow(mainPageViewModel, bookViewModel, recommendationViewModel)
+                    } else {
+                        print("Error: recommendationViewModel not provided")
+                    }
                 }
             }
         )
@@ -528,7 +543,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
 }
 
 @Composable
-fun addWindow(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, onDismiss: () -> Unit) {
+fun addWindow(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel, recommendationViewModel: RecommendationViewModel) {
     var selectedStatus by remember {mutableStateOf("New")}
     var chapter by remember { mutableStateOf(bookViewModel.getChapter()) }
     var page by remember { mutableStateOf(bookViewModel.getPage()) }
@@ -536,7 +551,7 @@ fun addWindow(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel
 
     Popup (
         alignment = Alignment.Center,
-        onDismissRequest = onDismiss,
+        onDismissRequest = {bookViewModel.onDismissAdd()},
         properties = PopupProperties(focusable = true),
         content = {
             Column(
@@ -686,7 +701,7 @@ fun addWindow(mainPageViewModel: MainPageViewModel, bookViewModel: BookViewModel
                             book.chapter = chapter
                             book.status = selectedStatus
                             mainPageViewModel.addBook(book)
-                            onDismiss()
+                            recommendationViewModel.onBookAdded()
                         },
                         modifier = Modifier.width(120.dp),
                         shape = RoundedCornerShape(16.dp),
