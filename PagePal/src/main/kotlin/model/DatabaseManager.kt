@@ -6,7 +6,6 @@ import com.mongodb.kotlin.client.coroutine.MongoCollection
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
-import org.bson.BsonDocument
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
@@ -65,10 +64,6 @@ class DatabaseManager(private val database: MongoDatabase) {
 
     suspend fun getUserByUsername(username: String): UserModel? {
         return userCollection.find(Filters.eq(UserModel::username.name, username)).firstOrNull()
-    }
-
-    suspend fun getAllUsers(): List<UserModel> {
-        return userCollection.find().toList()
     }
 
     suspend fun getBooksByAuthor(author: String): List<BookModel> {
@@ -140,6 +135,8 @@ class DatabaseManager(private val database: MongoDatabase) {
         println("Updated ${result.modifiedCount} document(s)")
     }
 
+    // Clean up functions for personal testing
+    /*
     suspend fun clearBookCollection() {
         val result = bookCollection.deleteMany(BsonDocument()) // Delete all documents from the BookCollection
         println("Deleted ${result.deletedCount} documents from BookCollection")
@@ -148,6 +145,6 @@ class DatabaseManager(private val database: MongoDatabase) {
     suspend fun clearUserCollection() {
         val result = userCollection.deleteMany(BsonDocument()) // Delete all documents from the UserCollection
         println("Deleted ${result.deletedCount} documents from UserCollection")
-    }
+    }*/
 
 }
