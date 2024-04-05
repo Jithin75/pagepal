@@ -753,6 +753,9 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                                     status = selectedStatus,
                                     chapter = chapter,
                                     page = page)*/
+                                bookModel!!.status = selectedStatus
+                                bookModel!!.chapter = chapter
+                                bookModel!!.page = page
                                 mainPageViewModel.addBook(bookModel!!)
                                 searchQuery = ""
                                 selectedBook = null
