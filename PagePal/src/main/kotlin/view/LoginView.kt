@@ -184,7 +184,6 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                         Text(text = "Sign Up")
                     }
                 }
-
             }
         }
     }

@@ -251,7 +251,8 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
 
                     // Book Grid
                     val scrollState = rememberLazyGridState()
-                    var displayedBooks = mainPageViewModel.getUserLibrary()
+                    mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
+                    val displayedBooks = mainPageViewModel.getUserLibrary()
                     LazyVerticalGrid(
                         state = scrollState,
                         columns = GridCells.Fixed(5),
@@ -430,6 +431,8 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
     var bookResults by remember { mutableStateOf<List<Book>>(emptyList()) }
     var chapter by remember { mutableStateOf("1") }
     var page by remember { mutableStateOf("1") }
+    var bookModel by remember { mutableStateOf<BookModel?>(null)}
+    val imageLoader = ImageLoader()
     //var statusExpanded by remember { mutableStateOf(false) }
 
     val statusList : List<String> = listOf("New", "In Progress", "Completed")
@@ -443,6 +446,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
             selectedBook = null
             selectedStatus = ""
             bookResults = emptyList()
+            bookModel = null
             mainPageViewModel.onDismissAddBook()
         },
         properties = PopupProperties(focusable = true),
@@ -468,7 +472,10 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                 ) {
                     TextField(
                         value = searchQuery,
-                        onValueChange = { searchQuery = it },
+                        onValueChange = {
+                            searchQuery = it
+                            bookModel = null
+                        },
                         label = { Text("Title", color = lightbrown) },
                         textStyle = TextStyle(color = whitevariation),
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -483,6 +490,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                             // Call API with searchText and populate searchResults
                             // This is a placeholder, replace it with your actual API call
                             bookResults = bookApiClient.searchBooks(searchQuery)
+                            bookModel = null
                         },
                         Modifier
                             .align(Alignment.CenterVertically)
@@ -511,9 +519,35 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                                 selectedBook = result
                                 searchQuery = result.title
                                 bookResults = emptyList()
+                                val bookInfo = selectedBook
+                                val pattern = Regex("&zoom=\\d+")
+                                val replacement = "&zoom=${mainPageViewModel.coverQuality}"
+                                var cover = bookInfo!!.img
+                                cover = cover.replace(pattern, replacement)
+                                bookModel = BookModel(
+                                    title = bookInfo.title,
+                                    author = bookInfo.authors,
+                                    cover = cover,
+                                    publisher = bookInfo.publisher,
+                                    publishYear = bookInfo.publishYear,
+                                    description = bookInfo.description,
+                                    categories = bookInfo.categories,
+                                    status = selectedStatus,
+                                    chapter = chapter,
+                                    page = page)
                             })
                         }
                     }
+                }
+
+                if(bookModel != null) {
+                    imageLoader.AsyncImage(
+                        load = { imageLoader.loadImageBitmap(bookModel!!.cover) },
+                        painterFor = { remember { BitmapPainter(it) } },
+                        contentDescription = bookModel!!.title,
+                        modifier = Modifier
+                            .size(160.dp, 160.dp)
+                    )
                 }
 
                 Row(
@@ -659,7 +693,8 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
 
                     OutlinedButton(
                         onClick = {
-                            if (selectedBook != null) {
+                            if (bookModel != null) {
+                                /*
                                 val bookInfo = selectedBook
                                 val pattern = Regex("&zoom=\\d+")
                                 val replacement = "&zoom=3"
@@ -675,14 +710,15 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                                     categories = bookInfo.categories,
                                     status = selectedStatus,
                                     chapter = chapter,
-                                    page = page)
-                                mainPageViewModel.addBook(book)
+                                    page = page)*/
+                                mainPageViewModel.addBook(bookModel!!)
                                 searchQuery = ""
                                 selectedBook = null
                                 selectedStatus = ""
                                 bookResults = emptyList()
                                 chapter = "1"
                                 page = "1"
+                                bookModel = null
                                 mainPageViewModel.onDismissAddBook()
                             }
                         },

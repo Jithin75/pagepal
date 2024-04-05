@@ -33,6 +33,9 @@ class MainPageViewModel (val userModel: UserModel,
     var isRecommendOpen by mutableStateOf(false)
         private set
 
+    var coverQuality by mutableStateOf("3")
+        private set
+
     fun toggleProfilePage() {
         isProfileOpen = !isProfileOpen
     }
@@ -72,6 +75,10 @@ class MainPageViewModel (val userModel: UserModel,
         isAddBookOpen = false
     }
 
+    fun changeCoverQuality (value: String) {
+        coverQuality = value
+    }
+
     /*
     fun statusFilter(status: String) {
         if (status == "All") {
@@ -85,6 +92,7 @@ class MainPageViewModel (val userModel: UserModel,
         displayedBooks = when(sortType) {
             "Title" -> bookLibrary.sortedBy { it.title }.toMutableList()
             "Author" -> bookLibrary.sortedBy { it.author }.toMutableList()
+            "Recently Added" -> bookLibrary.reversed().toMutableList()
             else -> bookLibrary.toMutableList()
         }
         if (status != "All") {
