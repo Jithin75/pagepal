@@ -129,7 +129,10 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     onValueChange = { username = it },
                     textStyle = TextStyle(color = whitevariation),
                     label = { Text("Username", color = lightbrown) },
-                    singleLine = true
+                    singleLine = true,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -140,7 +143,10 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     label = { Text("Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
                     visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -151,7 +157,10 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     label = { Text("Confirm Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
                     visualTransformation = PasswordVisualTransformation(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
