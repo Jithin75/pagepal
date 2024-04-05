@@ -29,16 +29,6 @@ class DatabaseManager(private val database: MongoDatabase) {
         println("Inserted User - ${result.insertedId}")
     }
 
-    suspend fun readUser() {
-        userCollection.find<UserModel>().collect { user ->
-            println("${user.username}'s Book List:")
-            user.library.forEach { bookId ->
-                val book = bookCollection.find(Filters.eq("_id", bookId)).firstOrNull()
-                println("${book?.title} by ${book?.author}")
-            }
-        }
-    }
-
     suspend fun updateUserBookList(username: String, newBook: String) {
         val filter: Bson = Filters.eq(UserModel::username.name, username)
         val update = Updates.addToSet(UserModel::library.name, newBook)
@@ -60,9 +50,17 @@ class DatabaseManager(private val database: MongoDatabase) {
     }
 
     suspend fun deleteUser(username: String) {
-        val filter: Bson = Filters.eq(UserModel::username.name, username)
-        val result = userCollection.deleteOne(filter)
-        println("Deleted count ${result.deletedCount}")
+        val user = getUserByUsername(username)
+        if (user != null) {
+            for (bookId in user.library) {
+                removeBook(bookId)
+            }
+            val filter: Bson = Filters.eq(UserModel::username.name, username)
+            val result = userCollection.deleteOne(filter)
+            println("Deleted count ${result.deletedCount}")
+        } else {
+            println("User with username $username not found.")
+        }
     }
 
     suspend fun getUserByUsername(username: String): UserModel? {
