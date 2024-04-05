@@ -753,18 +753,22 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                                     status = selectedStatus,
                                     chapter = chapter,
                                     page = page)*/
-                                bookModel!!.status = selectedStatus
-                                bookModel!!.chapter = chapter
-                                bookModel!!.page = page
-                                mainPageViewModel.addBook(bookModel!!)
-                                searchQuery = ""
-                                selectedBook = null
-                                selectedStatus = ""
-                                bookResults = emptyList()
-                                chapter = "1"
-                                page = "1"
-                                bookModel = null
-                                mainPageViewModel.onDismissAddBook()
+                                if(bookModel!!.newBook(mainPageViewModel.bookLibrary)) {
+                                    bookModel!!.status = selectedStatus
+                                    bookModel!!.chapter = chapter
+                                    bookModel!!.page = page
+                                    mainPageViewModel.addBook(bookModel!!)
+                                    searchQuery = ""
+                                    selectedBook = null
+                                    selectedStatus = ""
+                                    bookResults = emptyList()
+                                    chapter = "1"
+                                    page = "1"
+                                    bookModel = null
+                                    mainPageViewModel.onDismissAddBook()
+                                } else {
+                                    mainPageViewModel.toggleErrorMessage("Book already Exists")
+                                }
                             }
                         },
                         modifier = Modifier.width(120.dp),
@@ -776,6 +780,31 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         )
                     ) {
                         Text("ADD")
+                    }
+                    if (mainPageViewModel.errorMessage.isNotEmpty()) {
+                        AlertDialog(
+                            onDismissRequest = { mainPageViewModel.toggleErrorMessage("") },
+                            title = {
+                                Text(
+                                    text = "Error",
+                                    color = Color.White
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = mainPageViewModel.errorMessage,
+                                    color = Color.White
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = { mainPageViewModel.toggleErrorMessage("")}
+                                ) {
+                                    Text(text = "OK")
+                                }
+                            },
+                            backgroundColor = darkblue
+                        )
                     }
                 }
                 /*

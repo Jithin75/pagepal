@@ -11,4 +11,14 @@ data class BookModel (
     var status: String = "In Progress",
     var chapter: String = "1",
     var page: String = "1",
-    var bookId: String = "")
+    var bookId: String = "") {
+
+    fun newBook(Books: MutableList<BookModel>) : Boolean {
+        for(book in Books) {
+            if (book.title == title && book.author == author && book.description == description) {
+                return false
+            }
+        }
+        return true
+    }
+}

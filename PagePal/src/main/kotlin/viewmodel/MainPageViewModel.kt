@@ -36,6 +36,9 @@ class MainPageViewModel (val userModel: UserModel,
     var coverQuality by mutableStateOf("1")
         private set
 
+    var errorMessage by mutableStateOf("")
+        private set
+
     fun toggleProfilePage() {
         isProfileOpen = !isProfileOpen
     }
@@ -130,5 +133,9 @@ class MainPageViewModel (val userModel: UserModel,
 
     fun refreshDisplay() {
         displayedBooks = bookLibrary.toMutableList()
+    }
+
+    fun toggleErrorMessage(str: String) {
+        errorMessage = str
     }
 }
