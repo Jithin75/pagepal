@@ -35,9 +35,9 @@ compose.desktop {
 
         nativeDistributions {
             includeAllModules = true
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "team-102-5"
-            packageVersion = "1.2.0"
+            packageVersion = "2.0.0"
 
             appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
         }
