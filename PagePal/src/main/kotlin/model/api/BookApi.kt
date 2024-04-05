@@ -75,9 +75,9 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
                 ?.joinToString(", ") { it.asString } ?: "Categories not available"
             val imgLinks =  itemInfo.asJsonObject.get("imageLinks")?.asJsonObject
             val img = if (imgLinks != null) {
-                imgLinks.get("thumbnail")?.asString ?: "coverNotAvailable.png"
+                imgLinks.get("thumbnail")?.asString ?: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png"
             } else {
-                "coverNotAvailable.png"
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/2048px-No_image_available.svg.png"
             }
             books.add(Book(title, authors, img, publisher, publishYear, description, categories))
         }
