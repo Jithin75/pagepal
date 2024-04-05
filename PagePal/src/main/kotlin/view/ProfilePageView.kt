@@ -300,7 +300,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                     ) {
                         Text(
                             text = "Change Username",
-                            color = Color.White,
+                            color = Color.White
                         )
                     }
                 },
@@ -311,7 +311,10 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                             onValueChange = { profilePageViewModel.toggleNewUsername(it) },
                             label = { Text("New Username", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation),
-                            singleLine = true
+                            singleLine = true,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                            )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
@@ -319,7 +322,10 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                             onValueChange = { profilePageViewModel.toggleVerifyUsername(it) },
                             label = { Text("Verify New Username", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation),
-                            singleLine = true
+                            singleLine = true,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                            )
                         )
                     }
                 },
@@ -370,7 +376,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                     ) {
                         Text(
                             text = "Change Password",
-                            color = Color.White,
+                            color = Color.White
                         )
                     }
                 },
@@ -381,7 +387,10 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                             onValueChange = { profilePageViewModel.toggleCurrentPassword(it)},
                             label = { Text("Current Password", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation),
-                            singleLine = true
+                            singleLine = true,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                            )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
@@ -389,7 +398,10 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                             onValueChange = { profilePageViewModel.toggleNewPassword(it) },
                             label = { Text("New Password", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation),
-                            singleLine = true
+                            singleLine = true,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                            )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         OutlinedTextField(
@@ -397,7 +409,10 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                             onValueChange = { profilePageViewModel.toggleVerifyPassword(it) },
                             label = { Text("Verify New Password", color = lightbrown) },
                             textStyle = TextStyle(color = whitevariation),
-                            singleLine = true
+                            singleLine = true,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                            )
                         )
                     }
                 },
