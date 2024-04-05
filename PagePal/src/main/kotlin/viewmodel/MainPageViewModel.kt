@@ -33,7 +33,7 @@ class MainPageViewModel (val userModel: UserModel,
     var isRecommendOpen by mutableStateOf(false)
         private set
 
-    var coverQuality by mutableStateOf("3")
+    var coverQuality by mutableStateOf("1")
         private set
 
     fun toggleProfilePage() {

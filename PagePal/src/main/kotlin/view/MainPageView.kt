@@ -586,6 +586,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         contentDescription = bookModel!!.title,
                         modifier = Modifier
                             .size(160.dp, 160.dp)
+                            .weight(1f)
                     )
                 }
 
