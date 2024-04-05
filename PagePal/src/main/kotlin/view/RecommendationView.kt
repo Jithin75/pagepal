@@ -207,10 +207,11 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
             if (recommendationViewModel.isBookOpen) {
                 val bookModel = recommendationViewModel.bookOpened ?: BookModel(title = "error")
                 BookView(
-                    mainPageViewModel,
-                    BookViewModel(bookModel, mainPageViewModel.dbManager),
-                    isRecommended = true,
-                    onDismiss = { recommendationViewModel.onDismissBook() })
+                    mainPageViewModel = mainPageViewModel,
+                    bookViewModel = BookViewModel(bookModel, mainPageViewModel.dbManager),
+                    recommendationViewModel = recommendationViewModel,
+                    isRecommended = true
+                )
             }
         }
     }

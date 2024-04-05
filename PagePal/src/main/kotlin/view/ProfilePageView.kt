@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -191,6 +192,16 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                             Text("SAVE")
                         }
                     }
+
+                    Text(
+                        text = "(Note: Some covers are only available in Low Resolution)",
+                        style = TextStyle(
+                            fontWeight = FontWeight.W300,
+                            fontSize = 11.sp,
+                            color = Color.Red,
+                        ),
+                        fontStyle = FontStyle.Italic,
+                    )
 
                     // Personal Information
 
