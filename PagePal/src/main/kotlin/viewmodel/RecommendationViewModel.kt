@@ -1,7 +1,7 @@
 package viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import model.AIRecommender
 import model.api.BookApiClient
@@ -58,7 +58,7 @@ class RecommendationViewModel () {
             for (title in bookTitles) {
                 val book : BookModel = bookClient.searchBook(title)
                 val pattern = Regex("&zoom=\\d+")
-                val replacement = "&zoom=${mainPageViewModel.coverQuality}"
+                val replacement = "&zoom=${mainPageViewModel.userModel.coverQuality}"
                 val cover = book.cover
                 book.cover = cover.replace(pattern, replacement)
                 books.add(book)

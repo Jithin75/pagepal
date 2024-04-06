@@ -560,7 +560,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                                 bookResults = emptyList()
                                 val bookInfo = selectedBook
                                 val pattern = Regex("&zoom=\\d+")
-                                val replacement = "&zoom=${mainPageViewModel.coverQuality}"
+                                val replacement = "&zoom=${mainPageViewModel.userModel.coverQuality}"
                                 var cover = bookInfo!!.img
                                 cover = cover.replace(pattern, replacement)
                                 bookModel = BookModel(

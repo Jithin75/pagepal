@@ -113,7 +113,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                         horizontalArrangement = Arrangement.Center
                     ) {
                         val cornerRadius = 16.dp
-                        var selectedIndex by remember { mutableStateOf(mainPageViewModel.coverQuality.toInt() - 1) }
+                        var selectedIndex by remember { mutableStateOf(mainPageViewModel.userModel.coverQuality.toInt() - 1) }
 
                         qualityList.forEachIndexed { index, quality ->
 
@@ -269,9 +269,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                 confirmButton = {
                     Button(
                         onClick = {
-                            runBlocking {
-                                mainPageViewModel.dbManager?.deleteUser(mainPageViewModel.userModel.username)
-                            }
+                            profilePageViewModel.deleteAccount()
                             profilePageViewModel.toggleShowConfirmationDialog(false)
                             setCurrentState(LoginViewState(null, "login"))
                         }
@@ -292,20 +290,16 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
         if (profilePageViewModel.isShowUsernameChangeDialog()) {
             AlertDialog(
                 onDismissRequest = { profilePageViewModel.toggleShowUsernameChangeDialog(false) },
-                title = {
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 20.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "Change Username",
-                            color = Color.White
-                        )
-                    }
-                },
                 text = {
                     Column {
+                        Text(
+                            text = "Change Username",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 20.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
                         OutlinedTextField(
                             value = profilePageViewModel.newUsername,
                             onValueChange = { profilePageViewModel.toggleNewUsername(it) },
@@ -333,14 +327,11 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                     Button(
                         onClick = {
                             val userExist = runBlocking {
-                                mainPageViewModel.dbManager?.getUserByUsername(profilePageViewModel.newUsername)
+                                mainPageViewModel.dbManager.getUserByUsername(profilePageViewModel.newUsername)
                             }
                             if (userExist == null) {
                                 if (profilePageViewModel.newUsername == profilePageViewModel.verifyUsername) {
-                                    runBlocking {
-                                        mainPageViewModel.dbManager?.updateUsername(mainPageViewModel.userModel.username, profilePageViewModel.newUsername)
-                                    }
-                                    mainPageViewModel.userModel.username = profilePageViewModel.newUsername
+                                    profilePageViewModel.updateUsername()
                                     profilePageViewModel.toggleNewUsername("")
                                     profilePageViewModel.toggleVerifyUsername("")
                                     profilePageViewModel.toggleShowUsernameChangeDialog(false)
@@ -368,20 +359,16 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
         if (profilePageViewModel.isShowPasswordDialog()) {
             AlertDialog(
                 onDismissRequest = { profilePageViewModel.toggleShowPasswordDialog(false) },
-                title = {
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 20.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = "Change Password",
-                            color = Color.White
-                        )
-                    }
-                },
                 text = {
                     Column {
+                        Text(
+                            text = "Change Password",
+                            color = Color.White,
+                            style = TextStyle(
+                                fontSize = 20.sp
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
                         OutlinedTextField(
                             value = profilePageViewModel.currentPassword,
                             onValueChange = { profilePageViewModel.toggleCurrentPassword(it)},
@@ -421,10 +408,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                         onClick = {
                             if (PasswordEncryption.verifyPassword(profilePageViewModel.currentPassword, mainPageViewModel.userModel.password)) {
                                 if (profilePageViewModel.newPassword == profilePageViewModel.verifyPassword) {
-                                    runBlocking {
-                                        mainPageViewModel.dbManager?.changePassword(mainPageViewModel.userModel.username, profilePageViewModel.currentPassword, profilePageViewModel.newPassword)
-                                    }
-                                    mainPageViewModel.userModel.password = PasswordEncryption.hashPassword(profilePageViewModel.newPassword)
+                                    profilePageViewModel.updatePassword()
                                     profilePageViewModel.toggleNewPassword("")
                                     profilePageViewModel.toggleVerifyPassword("")
                                     profilePageViewModel.toggleCurrentPassword("")

@@ -3,9 +3,12 @@ package viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.runBlocking
+import org.example.model.DatabaseManager
+import org.example.model.PasswordEncryption
 import org.example.model.UserModel
 
-class ProfilePageViewModel (val userModel: UserModel){
+class ProfilePageViewModel (val userModel: UserModel, val dbManager: DatabaseManager){
     var currentPassword by mutableStateOf("")
         private set
     var newPassword by mutableStateOf("")
@@ -60,6 +63,25 @@ class ProfilePageViewModel (val userModel: UserModel){
     }
     fun toggleErrorMessage(str: String) {
         errorMessage = str
+    }
+    fun deleteAccount() {
+        runBlocking {
+            dbManager.deleteUser(userModel.username)
+        }
+    }
+
+    fun updateUsername(){
+        runBlocking {
+            dbManager.updateUsername(userModel.username, newUsername)
+        }
+       userModel.username = newUsername
+    }
+
+    fun updatePassword() {
+        runBlocking {
+            dbManager.changePassword(userModel.username, currentPassword, newPassword)
+        }
+        userModel.password = PasswordEncryption.hashPassword(newPassword)
     }
 
 }

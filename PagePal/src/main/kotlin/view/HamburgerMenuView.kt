@@ -106,7 +106,7 @@ fun HamburgerMenuView(mainPageViewModel: MainPageViewModel, setCurrentState: (Lo
                 }
             }
             if (mainPageViewModel.isProfileOpen) {
-                ProfilePageView(mainPageViewModel, ProfilePageViewModel(mainPageViewModel.userModel), setCurrentState)
+                ProfilePageView(mainPageViewModel, ProfilePageViewModel(mainPageViewModel.userModel, mainPageViewModel.dbManager), setCurrentState)
             }
             if (mainPageViewModel.isRecommendOpen) {
                 RecommendationView(mainPageViewModel, RecommendationViewModel())

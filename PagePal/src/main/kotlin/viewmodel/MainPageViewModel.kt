@@ -33,9 +33,6 @@ class MainPageViewModel (val userModel: UserModel,
     var isRecommendOpen by mutableStateOf(false)
         private set
 
-    var coverQuality by mutableStateOf("1")
-        private set
-
     var errorMessage by mutableStateOf("")
         private set
 
@@ -79,7 +76,10 @@ class MainPageViewModel (val userModel: UserModel,
     }
 
     fun changeCoverQuality (value: String) {
-        coverQuality = value
+        userModel.coverQuality = value
+        runBlocking {
+            dbManager.setCoverQuality(userModel, value)
+        }
     }
 
     /*

@@ -135,6 +135,13 @@ class DatabaseManager(private val database: MongoDatabase) {
         println("Updated ${result.modifiedCount} document(s)")
     }
 
+    suspend fun setCoverQuality(user: UserModel, newQuality: String) {
+        val filter = Filters.eq(UserModel::username.name, user.username)
+        val update = Updates.set(UserModel::coverQuality.name, newQuality)
+        val result = userCollection.updateOne(filter, update)
+        println("Updated ${result.modifiedCount} document(s)")
+    }
+
     // Clean up functions for personal testing
     /*
     suspend fun clearBookCollection() {
