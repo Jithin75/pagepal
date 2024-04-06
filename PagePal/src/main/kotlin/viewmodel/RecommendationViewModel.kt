@@ -33,7 +33,9 @@ class RecommendationViewModel () {
 
             userBooks.forEachIndexed { index, book ->
                 // Append the title and authors to the question string
-                question.append("${book.title}: ${book.author}")
+                val strippedTitle = book.title.replace("\"","\\\"")
+                val strippedAuthor = book.author.replace("\"","\\\"")
+                question.append("$strippedTitle: $strippedAuthor")
 
                 // Append newline character except for the last book
                 if (index < userBooks.size - 1) {
