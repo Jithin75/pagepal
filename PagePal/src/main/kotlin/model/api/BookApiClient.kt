@@ -26,7 +26,6 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
         }
         return parseBooks(jsonString)
     }
-//TODO: Need to rewrite this
     fun searchBook(query: String): BookModel {
         val formatQuery = query.replace(" ", "+")
         val url = "$baseUrl?q=${formatQuery}&key=${apiKey}"
@@ -44,6 +43,7 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
             val b = BookModel("")
             return b
         }
+//        val rawBook = if (bookList.isNotEmpty()) bookList[0] else Book()
         val rawBook = bookList[0]
         val b = BookModel(rawBook.title, rawBook.authors, rawBook.img, rawBook.publisher, rawBook.publishYear, rawBook.description, rawBook.categories)
         return b
