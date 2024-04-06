@@ -260,4 +260,20 @@ class DatabaseManagerTest {
             dbManager.removeBook(bookId)
         }
     }
+
+    @Test
+    fun setCoverQuality() {
+        runBlocking {
+            val user = UserModel(username = "testUser", password = "password")
+            dbManager.addUser(user)
+            assertEquals(user.coverQuality, "1")
+            dbManager.setCoverQuality(user, "2")
+            var updatedUser = dbManager.getUserByUsername("testUser")
+            assertEquals(updatedUser?.coverQuality, "2")
+            dbManager.setCoverQuality(user, "3")
+            updatedUser = dbManager.getUserByUsername("testUser")
+            assertEquals(updatedUser?.coverQuality, "3")
+            dbManager.deleteUser(user.username)
+        }
+    }
 }
