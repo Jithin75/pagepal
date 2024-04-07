@@ -24,14 +24,15 @@ import org.example.view.MainPageView
 import org.example.viewmodel.MainPageViewModel
 import view.LoginView
 import view.SignupView
+import viewmodel.LoginViewModel
+import viewmodel.SignupViewModel
 import java.awt.Dimension
+import kotlin.math.sign
 
 data class LoginViewState(val login: UserModel?, val view: String)
 
 @Composable
-fun App(currentView: MutableState<String>) {
-    var library: MutableList<String> = mutableListOf()
-    var bookLibrary : MutableList<BookModel> = mutableListOf()
+fun App() {
     val pojoCodecRegistry: CodecRegistry = fromRegistries(
         MongoClientSettings.getDefaultCodecRegistry(),
         fromProviders(PojoCodecProvider.builder().automatic(true).build())
@@ -41,22 +42,18 @@ fun App(currentView: MutableState<String>) {
     val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry);
     val dbManager = DatabaseManager(database)
 
-    val user = UserModel("Achille59", "complicatedPassw0rd", library )
-
-    val mainPageViewModel = remember { MainPageViewModel(user, bookLibrary, dbManager) }
     val (currentState, setCurrentState) = remember { mutableStateOf(LoginViewState(null, "login")) }
     if (currentState.view == "login") {
-        LoginView(setCurrentState)
+        LoginView(loginViewModel = LoginViewModel(setCurrentState, dbManager))
     } else if (currentState.view == "signup") {
-        SignupView(setCurrentState)
+        SignupView(signupViewModel = SignupViewModel(setCurrentState, dbManager))
     } else if (currentState.view == "main") {
         // Get user using loginID to get mainPageViewModel
-        //MainPageView(mainPageViewModel)
-        if(currentState.login == null) {
-            MainPageView(mainPageViewModel, setCurrentState)
+        if(currentState.login != null){
+            val BookLibrary : MutableList<BookModel> = runBlocking { dbManager.getUserLibraryDB(currentState.login) }
+            MainPageView(MainPageViewModel(currentState.login, BookLibrary, dbManager), setCurrentState)
         } else {
-            val newBookLibrary : MutableList<BookModel> = runBlocking { dbManager.getUserLibraryDB(currentState.login) }
-            MainPageView(MainPageViewModel(currentState.login, newBookLibrary, dbManager), setCurrentState)
+            println("Error: No user provided")
         }
     }
 }
@@ -69,13 +66,12 @@ fun main() = application {
         title = "PagePal",
         state = WindowState(
             position = WindowPosition(Alignment.Center),
-            size = DpSize(1024.dp, 576.dp)
         ),
         resizable = true,
         onCloseRequest = ::exitApplication
     ) {
         window.minimumSize = Dimension(1280, 720)
-        App(mutableStateOf("login"))
+        App()
     }
 }
 
