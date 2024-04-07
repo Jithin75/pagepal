@@ -1,6 +1,5 @@
 package view
 
-import LoginViewState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -13,42 +12,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
-import kotlinx.coroutines.runBlocking
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
-import org.example.model.DatabaseManager
 import theme.*
+import viewmodel.LoginViewModel
 
 @Composable
-fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
-    var username by remember { mutableStateOf(TextFieldValue()) }
-    var password by remember { mutableStateOf(TextFieldValue()) }
-    var showDialog by remember { mutableStateOf(false) }
-    var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
+fun LoginView(loginViewModel: LoginViewModel) {
 
-    LaunchedEffect(Unit) {
-        dbManager = runBlocking {
-            val pojoCodecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
-                MongoClientSettings.getDefaultCodecRegistry(),
-                CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-            )
-            val client =
-                MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
-            val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry)
-            DatabaseManager(database)
-        }
-    }
-
-    if (showDialog) {
+    if (loginViewModel.showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { loginViewModel.toggleShowDialog() },
             title = {
                 Text(
                     text = "Error",
@@ -63,7 +38,7 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
             },
             confirmButton = {
                 Button(
-                    onClick = { showDialog = false }
+                    onClick = { loginViewModel.toggleShowDialog() }
                 ) {
                     Text(text = "OK")
                 }
@@ -116,8 +91,8 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                 )
 
                 OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
+                    value = loginViewModel.username,
+                    onValueChange = { loginViewModel.usernameEntered(it) },
                     textStyle = TextStyle(color = whitevariation),
                     label = { Text("Username", color = lightbrown) },
                     singleLine = true,
@@ -129,8 +104,8 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = loginViewModel.password,
+                    onValueChange = { loginViewModel.passwordEntered(it) },
                     label = { Text("Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
                     visualTransformation = PasswordVisualTransformation(),
@@ -150,27 +125,7 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                 ) {
                     Button(
                         onClick = {
-                            if(username.text == "enter") {
-                                setCurrentState(LoginViewState(null, "main"))
-                            } else {
-                                if (username.text.isNotEmpty() && password.text.isNotEmpty()) {
-                                    val isValid = runBlocking {
-                                        dbManager?.isValidCredentials(username.text, password.text)
-                                    }
-                                    if (isValid == true) {
-                                        val User = runBlocking {
-                                            dbManager?.getUserByUsername(username.text)
-                                        }
-                                        if (User != null) {
-                                            setCurrentState(LoginViewState(User, "main"))
-                                        } else {
-                                            showDialog = true // Show dialog for incorrect credentials
-                                        }
-                                    } else {
-                                        showDialog = true // Show dialog for incorrect credentials
-                                    }
-                                }
-                            }
+                            loginViewModel.loginUser()
                         },
                         colors = ButtonDefaults.buttonColors(
                             contentColor = lightbrown,
@@ -183,7 +138,7 @@ fun LoginView(setCurrentState: (LoginViewState) -> Unit) {
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Button(
-                        onClick = {setCurrentState(LoginViewState(null, "signup"))},
+                        onClick = {loginViewModel.switchSignUp()},
                         colors = ButtonDefaults.buttonColors(
                             contentColor = lightbrown, // Text color of the button
                             backgroundColor = grey

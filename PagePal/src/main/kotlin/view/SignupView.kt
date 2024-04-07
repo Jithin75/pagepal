@@ -26,31 +26,15 @@ import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.DatabaseManager
 import org.example.model.UserModel
 import theme.*
+import viewmodel.SignupViewModel
+import kotlin.math.sign
 
 @Composable
-fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
-    var username by remember { mutableStateOf(TextFieldValue()) }
-    var password by remember { mutableStateOf(TextFieldValue()) }
-    var password_confirm by remember { mutableStateOf(TextFieldValue()) }
-    var showDialog by remember { mutableIntStateOf(0) }
-    var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
+fun SignupView(signupViewModel: SignupViewModel) {
 
-    LaunchedEffect(Unit) {
-        dbManager = runBlocking {
-            val pojoCodecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
-                MongoClientSettings.getDefaultCodecRegistry(),
-                CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-            )
-            val client =
-                MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
-            val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry)
-            DatabaseManager(database)
-        }
-    }
-
-    if (showDialog != 0) {
+    if (signupViewModel.showDialog != 0) {
         AlertDialog(
-            onDismissRequest = { showDialog = 0 },
+            onDismissRequest = { signupViewModel.modifyShowDialog(0) },
             title = {
                 Text(
                     text = "Error",
@@ -58,12 +42,12 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                 )
             },
             text = {
-                if (showDialog == 1) {
+                if (signupViewModel.showDialog == 1) {
                     Text(
                         text = "PASSWORD MISMATCH, PLEASE ENTER THE SAME PASSWORD",
                         color = lightbrown
                     )
-                } else if(showDialog == 2) {
+                } else if(signupViewModel.showDialog == 2) {
                     Text(
                         text = "USERNAME ALREADY EXISTS",
                         color = lightbrown
@@ -72,7 +56,7 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
             },
             confirmButton = {
                 Button(
-                    onClick = { showDialog = 0 }
+                    onClick = { signupViewModel.modifyShowDialog(0) }
                 ) {
                     Text(text = "OK")
                 }
@@ -125,8 +109,8 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                 )
 
                 OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
+                    value = signupViewModel.username,
+                    onValueChange = { signupViewModel.usernameEntered(it) },
                     textStyle = TextStyle(color = whitevariation),
                     label = { Text("Username", color = lightbrown) },
                     singleLine = true,
@@ -138,8 +122,8 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = signupViewModel.password,
+                    onValueChange = { signupViewModel.passwordEntered(it) },
                     label = { Text("Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
                     visualTransformation = PasswordVisualTransformation(),
@@ -152,8 +136,8 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = password_confirm,
-                    onValueChange = { password_confirm = it },
+                    value = signupViewModel.password_confirm,
+                    onValueChange = { signupViewModel.passwordConfirmEntered(it) },
                     label = { Text("Confirm Password", color = lightbrown) },
                     textStyle = TextStyle(color = whitevariation),
                     visualTransformation = PasswordVisualTransformation(),
@@ -170,7 +154,7 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Button(
-                        onClick = {setCurrentState(LoginViewState(null, "login"))},
+                        onClick = { signupViewModel.switchLogIn() },
                         colors = ButtonDefaults.buttonColors(
                             contentColor = lightbrown, // Text color of the button
                             backgroundColor = grey
@@ -182,31 +166,7 @@ fun SignupView(setCurrentState: (LoginViewState) -> Unit) {
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Button(
-                        onClick = {
-                            val userExist = runBlocking {
-                                dbManager?.getUserByUsername(username.text)
-                            }
-                            if (userExist != null) {
-                                showDialog = 2
-                            } else {
-                                if (username.text.isNotEmpty() && password.text.isNotEmpty() && password_confirm.text.isNotEmpty()) {
-                                    if (password.text.trim() != password_confirm.text.trim()) {
-                                        showDialog = 1
-                                    } else {
-                                        runBlocking {
-                                            dbManager?.addUser(
-                                                UserModel(
-                                                    username.text.trim(),
-                                                    password.text.trim(),
-                                                    mutableListOf()
-                                                )
-                                            )
-                                        }
-                                        setCurrentState(LoginViewState(null, "login"))
-                                    }
-                                }
-                            }
-                                  },
+                        onClick = { signupViewModel.signupUser() },
                         colors = ButtonDefaults.buttonColors(
                             contentColor = lightbrown, // Text color of the button
                             backgroundColor = grey
