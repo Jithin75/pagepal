@@ -8,27 +8,20 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
-import kotlinx.coroutines.runBlocking
-import model.AIRecommender
-import model.api.BookApiClient
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
 import org.example.model.BookModel
-import org.example.model.DatabaseManager
 import org.example.view.BookItem
 import org.example.viewmodel.MainPageViewModel
-import org.json.JSONArray
-import org.json.JSONObject
 import theme.darkblue
 import theme.grey
 import theme.lightbrown
@@ -184,6 +177,17 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
                             .background(color = darkblue)
                             .padding(10.dp)
                     ) {
+                        // Title
+                        Text(
+                            text = AnnotatedString("AI Recommendations", spanStyle = SpanStyle(textDecoration = TextDecoration.Underline)),
+                            color = lightbrown,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp // Set the font size to 30sp
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp)) // Add space below the text
+
                         // Book Grid
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(5),
