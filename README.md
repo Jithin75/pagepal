@@ -8,6 +8,14 @@ Welcome to PagePal – the all-in-one application designed to transform your rea
 
 With PagePal, you can track your reading progress, manage your book collection, receive AI-powered personalized book recommendations, and set reading goals. Our goal is to create a cohesive and satisfying reading experience for our users, making reading more accessible and enjoyable for everyone.
 
+### Advanced Features:
+
+We believe that we were able to achieve the following advanced features:
+- Utilize data from an existing cloud service (e.g. search Twitter data; load image data from Google; lookup names of Pokemon on a custom REST service). See the list below for some potential APIs.
+- Deploy your database to the cloud to store private data. Implement appropriate privacy/security measures (e.g. hashed and encrypted password; secure authentication using tokens).
+- Support multi-user scenarios. This means supporting different users, each with their own data, stored in the cloud (must be paired with some cloud deployment, as above).
+- Support single-user multi-device scenarios. This requires the ability to have your data shared across different instances of your application running concurrently (must be paired with some cloud deployment as above).
+
 ### Screenshots:
 
 ![Login Page](https://git.uwaterloo.ca/ppremsan/team-102-5/-/blob/main/PagePal/src/main/resources/login.png)
@@ -20,11 +28,11 @@ With PagePal, you can track your reading progress, manage your book collection, 
 
 ### User Documentation:
 
-[User Documentaion](../../wikis/User-Documentation)
+[User Documentation](../../wikis/User-Documentation)
 
 ### Design Documentation:
 
-[Design Documentaion](../../wikis/Design-Documentation)
+[Design Documentation](../../wikis/Design-Documentation)
 
 ### Release Notes:
 
