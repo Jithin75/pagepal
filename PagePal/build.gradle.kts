@@ -36,8 +36,8 @@ compose.desktop {
         nativeDistributions {
             includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = "team-102-5"
-            packageVersion = "2.0.0"
+            packageName = "PagePal"
+            packageVersion = "2.1.0"
 
             appResourcesRootDir.set(project.layout.projectDirectory.dir("resources"))
         }

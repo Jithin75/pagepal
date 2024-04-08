@@ -62,7 +62,7 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
         }
         val books = mutableListOf<Book>()
 
-        items?.forEach { item ->
+        items.forEach { item ->
             val itemInfo = item.asJsonObject.get("volumeInfo")
             val title = itemInfo.asJsonObject.get("title")?.asString ?: ""
             val authors = itemInfo.asJsonObject.get("authors")?.asJsonArray
