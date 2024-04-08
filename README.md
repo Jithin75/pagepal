@@ -18,6 +18,8 @@ We believe that we were able to achieve the following advanced features:
 
 ### Screenshots:
 
+![Homepage](PagePal/src/main/resources/homepage.png)
+
 ![Login Page](PagePal/src/main/resources/book-page.png)
 
 ### Team Members:
