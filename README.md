@@ -10,7 +10,7 @@ With PagePal, you can track your reading progress, manage your book collection, 
 
 ### Advanced Features:
 
-We believe that we were able to achieve the following advanced features:
+We were able to achieve the following advanced features:
 - Utilize data from an existing cloud service (e.g. search Twitter data; load image data from Google; lookup names of Pokemon on a custom REST service). See the list below for some potential APIs.
 - Deploy your database to the cloud to store private data. Implement appropriate privacy/security measures (e.g. hashed and encrypted password; secure authentication using tokens).
 - Support multi-user scenarios. This means supporting different users, each with their own data, stored in the cloud (must be paired with some cloud deployment, as above).
