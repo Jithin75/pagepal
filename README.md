@@ -18,7 +18,7 @@ We believe that we were able to achieve the following advanced features:
 
 ### Screenshots:
 
-![Login Page](https://git.uwaterloo.ca/ppremsan/team-102-5/-/blob/main/PagePal/src/main/resources/login.png)
+![Login Page](PagePal/src/main/resources/login.png)
 
 ### Team Members:
 1. Achille Desreumaux: adesreum@uwaterloo.ca
