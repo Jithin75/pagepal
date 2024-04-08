@@ -25,10 +25,9 @@ class RecommendationViewModel () {
 
     fun initiateDisplayedBooks(mainPageViewModel: MainPageViewModel) {
         try {
-            var userBooks = mainPageViewModel.getUserLibrary()
+            val userBooks = mainPageViewModel.getUserBookList()
 
             val question = StringBuilder()
-            question.append("The user has read the following books: \\n")
 
             userBooks.forEachIndexed { index, book ->
                 // Append the title and authors to the question string

@@ -12,7 +12,18 @@ import model.UserModel
 class MainPageViewModel (val userModel: UserModel,
                          val bookLibrary : MutableList<BookModel>,
                          val dbManager: DatabaseManager) {
-    var displayedBooks by mutableStateOf(bookLibrary)
+    var displayedBooks by mutableStateOf(mutableListOf<BookModel>())
+        private set
+
+    var isFilterChanged by mutableStateOf(true)
+
+    var sortSelected by mutableStateOf("Default")
+        private set
+
+    var statusSelected by mutableStateOf("All")
+        private set
+
+    var searchContent by mutableStateOf("")
         private set
 
     var isHamburgerOpen by mutableStateOf(false)
@@ -36,8 +47,23 @@ class MainPageViewModel (val userModel: UserModel,
     var errorMessage by mutableStateOf("")
         private set
 
+    fun searchContentEntered(entry: String) {
+        searchContent = entry
+    }
+
+    fun newSortSelected(entry: String) {
+        sortSelected = entry
+    }
+
+    fun newStatusSelected(entry: String) {
+        statusSelected = entry
+    }
+
     fun toggleProfilePage() {
         isProfileOpen = !isProfileOpen
+        if(!isProfileOpen) {
+            isHamburgerOpen = false
+        }
     }
 
     fun onRecommendPageClick() {
@@ -47,6 +73,8 @@ class MainPageViewModel (val userModel: UserModel,
     fun onDismissRecommend() {
         isRecommendOpen = false
         isHamburgerOpen = false
+        isFilterChanged = true
+        filter()
     }
 
     fun onBookClick(bookModel: BookModel) {
@@ -82,23 +110,38 @@ class MainPageViewModel (val userModel: UserModel,
         }
     }
 
-    fun filter(sortType: String, status: String, searchValue: String) {
-        displayedBooks = when(sortType) {
-            "Title" -> bookLibrary.sortedBy { it.title }.toMutableList()
-            "Author" -> bookLibrary.sortedBy { it.author }.toMutableList()
-            "Recently Added" -> bookLibrary.reversed().toMutableList()
-            else -> bookLibrary.toMutableList()
-        }
-        if (status != "All") {
-            displayedBooks = displayedBooks.filter { it.status.contains(status, ignoreCase = true) }.toMutableList()
-        }
-        if(searchValue.isNotBlank()) {
-            displayedBooks = displayedBooks.filter { it.title.contains(searchValue, ignoreCase = true) }.toMutableList()
+    fun filterChanged() {
+        isFilterChanged = true
+    }
+
+    fun filter() {
+        if(isFilterChanged) {
+            displayedBooks = when (sortSelected) {
+                "Title" -> bookLibrary.sortedBy { it.title }.toMutableList()
+                "Author" -> bookLibrary.sortedBy { it.author }.toMutableList()
+                "Recently Added" -> bookLibrary.reversed().toMutableList()
+                else -> bookLibrary.toMutableList()
+            }
+            if (statusSelected != "All") {
+                val filteredBooks = displayedBooks.filter { it.status.contains(statusSelected, ignoreCase = true) }
+                displayedBooks.clear()
+                displayedBooks.addAll(filteredBooks)
+            }
+            if (searchContent != "") {
+                val filteredBooks = displayedBooks.filter { it.title.contains(searchContent, ignoreCase = true) }
+                displayedBooks.clear()
+                displayedBooks.addAll(filteredBooks)
+            }
+            isFilterChanged = false
         }
     }
 
     fun getUserLibrary(): MutableList<BookModel> {
         return displayedBooks
+    }
+
+    fun getUserBookList(): MutableList<BookModel> {
+        return bookLibrary
     }
 
     fun addBook(book: BookModel) {

@@ -246,216 +246,216 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                         Text("Delete Account")
                     }
                 }
+                if (profilePageViewModel.showConfirmationDialog) {
+                    AlertDialog(
+                        onDismissRequest = { profilePageViewModel.toggleShowConfirmationDialog(false)},
+                        title = {
+                            Text(
+                                text = "Delete Account",
+                                color = Color.White,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Are you sure you want to delete your account?",
+                                color = Color.White
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    profilePageViewModel.deleteAccount()
+                                    profilePageViewModel.toggleShowConfirmationDialog(false)
+                                    setCurrentState(LoginViewState(null, "login"))
+                                }
+                            ) {
+                                Text("Yes")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = { profilePageViewModel.toggleShowConfirmationDialog(false)}
+                            ) {
+                                Text("No")
+                            }
+                        },
+                        backgroundColor = darkblue
+                    )
+                }
+                if (profilePageViewModel.showUsernameChangeDialog) {
+                    AlertDialog(
+                        onDismissRequest = { profilePageViewModel.toggleShowUsernameChangeDialog(false) },
+                        text = {
+                            Column {
+                                Text(
+                                    text = "Change Username",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 20.sp
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                OutlinedTextField(
+                                    value = profilePageViewModel.newUsername,
+                                    onValueChange = { profilePageViewModel.toggleNewUsername(it) },
+                                    label = { Text("New Username", color = lightbrown) },
+                                    textStyle = TextStyle(color = whitevariation),
+                                    singleLine = true,
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = profilePageViewModel.verifyUsername,
+                                    onValueChange = { profilePageViewModel.toggleVerifyUsername(it) },
+                                    label = { Text("Verify New Username", color = lightbrown) },
+                                    textStyle = TextStyle(color = whitevariation),
+                                    singleLine = true,
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                                    )
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    val userExist = runBlocking {
+                                        mainPageViewModel.dbManager.getUserByUsername(profilePageViewModel.newUsername)
+                                    }
+                                    if (userExist == null) {
+                                        if (profilePageViewModel.newUsername == profilePageViewModel.verifyUsername) {
+                                            profilePageViewModel.updateUsername()
+                                            profilePageViewModel.toggleNewUsername("")
+                                            profilePageViewModel.toggleVerifyUsername("")
+                                            profilePageViewModel.toggleShowUsernameChangeDialog(false)
+                                        } else {
+                                            profilePageViewModel.toggleErrorMessage("Usernames do not match")
+                                        }
+                                    } else {
+                                        profilePageViewModel.toggleErrorMessage("Username already taken")
+                                    }
+                                }
+                            ) {
+                                Text(text = "Change")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = { profilePageViewModel.toggleShowUsernameChangeDialog(false)}
+                            ) {
+                                Text(text = "Cancel")
+                            }
+                        },
+                        backgroundColor = darkblue
+                    )
+                }
+                if (profilePageViewModel.showPasswordDialog) {
+                    AlertDialog(
+                        onDismissRequest = { profilePageViewModel.toggleShowPasswordDialog(false) },
+                        text = {
+                            Column {
+                                Text(
+                                    text = "Change Password",
+                                    color = Color.White,
+                                    style = TextStyle(
+                                        fontSize = 20.sp
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                OutlinedTextField(
+                                    value = profilePageViewModel.currentPassword,
+                                    onValueChange = { profilePageViewModel.toggleCurrentPassword(it)},
+                                    label = { Text("Current Password", color = lightbrown) },
+                                    textStyle = TextStyle(color = whitevariation),
+                                    singleLine = true,
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = profilePageViewModel.newPassword,
+                                    onValueChange = { profilePageViewModel.toggleNewPassword(it) },
+                                    label = { Text("New Password", color = lightbrown) },
+                                    textStyle = TextStyle(color = whitevariation),
+                                    singleLine = true,
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = profilePageViewModel.verifyPassword,
+                                    onValueChange = { profilePageViewModel.toggleVerifyPassword(it) },
+                                    label = { Text("Verify New Password", color = lightbrown) },
+                                    textStyle = TextStyle(color = whitevariation),
+                                    singleLine = true,
+                                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                                        unfocusedBorderColor = lightbrown // Set the outline color when not focused
+                                    )
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    if (PasswordEncryption.verifyPassword(profilePageViewModel.currentPassword, mainPageViewModel.userModel.password)) {
+                                        if (profilePageViewModel.newPassword == profilePageViewModel.verifyPassword) {
+                                            profilePageViewModel.updatePassword()
+                                            profilePageViewModel.toggleNewPassword("")
+                                            profilePageViewModel.toggleVerifyPassword("")
+                                            profilePageViewModel.toggleCurrentPassword("")
+                                            profilePageViewModel.toggleShowPasswordDialog(false)
+                                        } else {
+                                            profilePageViewModel.toggleErrorMessage("Passwords do not match")
+                                        }
+                                    } else {
+                                        profilePageViewModel.toggleErrorMessage("Incorrect current password")
+                                    }
+                                }
+                            ) {
+                                Text(text = "Change")
+                            }
+                        },
+                        dismissButton = {
+                            Button(
+                                onClick = { profilePageViewModel.toggleShowPasswordDialog(false) }
+                            ) {
+                                Text(text = "Cancel")
+                            }
+                        },
+                        backgroundColor = darkblue
+                    )
+                }
+                if (profilePageViewModel.errorMessage.isNotEmpty()) {
+                    AlertDialog(
+                        onDismissRequest = { profilePageViewModel.toggleErrorMessage("") },
+                        title = {
+                            Text(
+                                text = "Error",
+                                color = Color.White
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = profilePageViewModel.errorMessage,
+                                color = Color.White
+                            )
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = { profilePageViewModel.toggleErrorMessage("")}
+                            ) {
+                                Text(text = "OK")
+                            }
+                        },
+                        backgroundColor = darkblue
+                    )
+                }
             }
         )
-        if (profilePageViewModel.showConfirmationDialog) {
-            AlertDialog(
-                onDismissRequest = { profilePageViewModel.toggleShowConfirmationDialog(false)},
-                title = {
-                    Text(
-                        text = "Delete Account",
-                        color = Color.White,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                },
-                text = {
-                    Text(
-                        text = "Are you sure you want to delete your account?",
-                        color = Color.White
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            profilePageViewModel.deleteAccount()
-                            profilePageViewModel.toggleShowConfirmationDialog(false)
-                            setCurrentState(LoginViewState(null, "login"))
-                        }
-                    ) {
-                        Text("Yes")
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = { profilePageViewModel.toggleShowConfirmationDialog(false)}
-                    ) {
-                        Text("No")
-                    }
-                },
-                backgroundColor = darkblue
-            )
-        }
-        if (profilePageViewModel.showUsernameChangeDialog) {
-            AlertDialog(
-                onDismissRequest = { profilePageViewModel.toggleShowUsernameChangeDialog(false) },
-                text = {
-                    Column {
-                        Text(
-                            text = "Change Username",
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 20.sp
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        OutlinedTextField(
-                            value = profilePageViewModel.newUsername,
-                            onValueChange = { profilePageViewModel.toggleNewUsername(it) },
-                            label = { Text("New Username", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation),
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = profilePageViewModel.verifyUsername,
-                            onValueChange = { profilePageViewModel.toggleVerifyUsername(it) },
-                            label = { Text("Verify New Username", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation),
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
-                            )
-                        )
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            val userExist = runBlocking {
-                                mainPageViewModel.dbManager.getUserByUsername(profilePageViewModel.newUsername)
-                            }
-                            if (userExist == null) {
-                                if (profilePageViewModel.newUsername == profilePageViewModel.verifyUsername) {
-                                    profilePageViewModel.updateUsername()
-                                    profilePageViewModel.toggleNewUsername("")
-                                    profilePageViewModel.toggleVerifyUsername("")
-                                    profilePageViewModel.toggleShowUsernameChangeDialog(false)
-                                } else {
-                                    profilePageViewModel.toggleErrorMessage("Usernames do not match")
-                                }
-                            } else {
-                                profilePageViewModel.toggleErrorMessage("Username already taken")
-                            }
-                        }
-                    ) {
-                        Text(text = "Change")
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = { profilePageViewModel.toggleShowUsernameChangeDialog(false)}
-                    ) {
-                        Text(text = "Cancel")
-                    }
-                },
-                backgroundColor = darkblue
-            )
-        }
-        if (profilePageViewModel.showPasswordDialog) {
-            AlertDialog(
-                onDismissRequest = { profilePageViewModel.toggleShowPasswordDialog(false) },
-                text = {
-                    Column {
-                        Text(
-                            text = "Change Password",
-                            color = Color.White,
-                            style = TextStyle(
-                                fontSize = 20.sp
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        OutlinedTextField(
-                            value = profilePageViewModel.currentPassword,
-                            onValueChange = { profilePageViewModel.toggleCurrentPassword(it)},
-                            label = { Text("Current Password", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation),
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = profilePageViewModel.newPassword,
-                            onValueChange = { profilePageViewModel.toggleNewPassword(it) },
-                            label = { Text("New Password", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation),
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = profilePageViewModel.verifyPassword,
-                            onValueChange = { profilePageViewModel.toggleVerifyPassword(it) },
-                            label = { Text("Verify New Password", color = lightbrown) },
-                            textStyle = TextStyle(color = whitevariation),
-                            singleLine = true,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                unfocusedBorderColor = lightbrown // Set the outline color when not focused
-                            )
-                        )
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            if (PasswordEncryption.verifyPassword(profilePageViewModel.currentPassword, mainPageViewModel.userModel.password)) {
-                                if (profilePageViewModel.newPassword == profilePageViewModel.verifyPassword) {
-                                    profilePageViewModel.updatePassword()
-                                    profilePageViewModel.toggleNewPassword("")
-                                    profilePageViewModel.toggleVerifyPassword("")
-                                    profilePageViewModel.toggleCurrentPassword("")
-                                    profilePageViewModel.toggleShowPasswordDialog(false)
-                                } else {
-                                    profilePageViewModel.toggleErrorMessage("Passwords do not match")
-                                }
-                            } else {
-                                profilePageViewModel.toggleErrorMessage("Incorrect current password")
-                            }
-                        }
-                    ) {
-                        Text(text = "Change")
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = { profilePageViewModel.toggleShowPasswordDialog(false) }
-                    ) {
-                        Text(text = "Cancel")
-                    }
-                },
-                backgroundColor = darkblue
-            )
-        }
-        if (profilePageViewModel.errorMessage.isNotEmpty()) {
-            AlertDialog(
-                onDismissRequest = { profilePageViewModel.toggleErrorMessage("") },
-                title = {
-                    Text(
-                        text = "Error",
-                        color = Color.White
-                    )
-                },
-                text = {
-                    Text(
-                        text = profilePageViewModel.errorMessage,
-                        color = Color.White
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = { profilePageViewModel.toggleErrorMessage("")}
-                    ) {
-                        Text(text = "OK")
-                    }
-                },
-                backgroundColor = darkblue
-            )
-        }
     }
 }

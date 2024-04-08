@@ -46,8 +46,6 @@ import model.api.BookApiClient
 import model.BookModel
 import viewmodel.MainPageViewModel
 import theme.*
-import view.BookView
-import view.HamburgerMenuView
 import viewmodel.BookViewModel
 
 
@@ -57,10 +55,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
     val sortOptions =  listOf("Default","Title", "Author", "Recently Added")
     val statusOptions = listOf("All","New", "In Progress", "Completed")
     var sortExpanded by remember { mutableStateOf(false) }
-    var sortSelectedOptionText by remember { mutableStateOf(sortOptions[0])}
     var statusExpanded by remember { mutableStateOf(false) }
-    var statusSelectedOptionText by remember { mutableStateOf(statusOptions[0])}
-    var searchContent by remember {mutableStateOf("")}
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val searchFocusRequester = remember { FocusRequester() }
@@ -133,10 +128,11 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                             modifier = Modifier.weight(6f)
                         ) {
                             TextField(
-                                value = searchContent,
-                                onValueChange = { newValue : String ->
-                                    searchContent = newValue
-                                    mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
+                                value = mainPageViewModel.searchContent,
+                                onValueChange = {
+                                    mainPageViewModel.searchContentEntered(it)
+                                    mainPageViewModel.filterChanged()
+                                    mainPageViewModel.filter()
                                 },
                                 leadingIcon = { Icon(
                                     Icons.Filled.Search,
@@ -165,7 +161,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                 ),
                                 modifier = Modifier
                                     .width(320.dp)
-                                    .height(50.dp)
+                                    .height(56.dp)
                                     .padding(horizontal = 8.dp)
                                     .align(Alignment.CenterVertically)
                                     .weight(1.2f)
@@ -176,15 +172,15 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
                                     .align(Alignment.CenterVertically)
-                                    .size(192.dp, 50.dp)
+                                    .size(192.dp, 54.dp)
                                     .weight(0.9f)
                                     .clip(RoundedCornerShape(1.dp))
                                     .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
                                     .clickable { statusExpanded = !statusExpanded },
                             ) {
                                 Text(
-                                    text = if(statusSelectedOptionText == "All") { "Status" }
-                                    else { statusSelectedOptionText },
+                                    text = if(mainPageViewModel.statusSelected == "All") { "Status" }
+                                    else { mainPageViewModel.statusSelected },
                                     fontSize = 14.sp,
                                     modifier = Modifier.padding(start = 10.dp),
                                     color = lightgrey
@@ -202,8 +198,9 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                     statusOptions.forEach { selectionOption ->
                                         DropdownMenuItem(
                                             onClick = {
-                                                statusSelectedOptionText = selectionOption
-                                                mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
+                                                mainPageViewModel.newStatusSelected(selectionOption)
+                                                mainPageViewModel.filterChanged()
+                                                mainPageViewModel.filter()
                                                 statusExpanded = false
                                             }
                                         ) {
@@ -217,15 +214,15 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp)
                                     .align(Alignment.CenterVertically)
-                                    .size(192.dp, 50.dp)
+                                    .size(192.dp, 54.dp)
                                     .weight(0.9f)
                                     .clip(RoundedCornerShape(1.dp))
                                     .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
                                     .clickable { sortExpanded = !sortExpanded },
                             ) {
                                 Text(
-                                    text = if(sortSelectedOptionText == "Default") { "Sort" }
-                                    else { sortSelectedOptionText },
+                                    text = if(mainPageViewModel.sortSelected == "Default") { "Sort" }
+                                    else { mainPageViewModel.sortSelected },
                                     fontSize = 14.sp,
                                     modifier = Modifier.padding(start = 10.dp),
                                     color = lightgrey
@@ -243,8 +240,9 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                     sortOptions.forEach { selectionOption ->
                                         DropdownMenuItem(
                                             onClick = {
-                                                sortSelectedOptionText = selectionOption
-                                                mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
+                                                mainPageViewModel.newSortSelected(selectionOption)
+                                                mainPageViewModel.filterChanged()
+                                                mainPageViewModel.filter()
                                                 sortExpanded = false
                                             }
                                         ) {
@@ -271,7 +269,7 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
 
                     // Book Grid
                     val scrollState = rememberLazyGridState()
-                    mainPageViewModel.filter(sortSelectedOptionText, statusSelectedOptionText, searchContent)
+                    mainPageViewModel.filter()
                     val displayedBooks = mainPageViewModel.getUserLibrary()
                     LazyVerticalGrid(
                         state = scrollState,

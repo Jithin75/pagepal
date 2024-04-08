@@ -38,6 +38,7 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
     MaterialTheme {
         // Show loading screen while data is being fetched
         if (recommendationViewModel.isLoading) {
+            println(recommendationViewModel.isLoading)
             Scaffold(
                 topBar = {
                     TopAppBar(
@@ -80,6 +81,7 @@ fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewM
             )
         } else {
             // Actual content of the screen
+            println("Else reached")
             Scaffold(
                 topBar = {
                     TopAppBar(
