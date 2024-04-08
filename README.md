@@ -8,8 +8,6 @@ Welcome to PagePal – the all-in-one application designed to transform your rea
 
 With PagePal, you can track your reading progress, manage your book collection, receive AI-powered personalized book recommendations, and set reading goals. Our goal is to create a cohesive and satisfying reading experience for our users, making reading more accessible and enjoyable for everyone.
 
-### Screenshots:
-
 ### Team Members:
 1. Achille Desreumaux: adesreum@uwaterloo.ca
 2. Aditya Parekh: a6parekh@uwaterloo.ca
