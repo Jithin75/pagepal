@@ -38,13 +38,7 @@ class LoginViewModel (val setCurrentState: (LoginViewState) -> Unit, val dbManag
                 val User = runBlocking {
                     dbManager.getUserByUsername(username)
                 }
-                if (User != null) {
-                    setCurrentState(LoginViewState(User, "main"))
-                } else {
-                    showDialog = true // Show dialog for incorrect credentials
-                    username = ""
-                    password = ""
-                }
+                setCurrentState(LoginViewState(User, "main"))
             } else {
                 showDialog = true // Show dialog for incorrect credentials
                 username = ""
