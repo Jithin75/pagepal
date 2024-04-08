@@ -34,6 +34,7 @@ class ProfilePageTest {
             profile.deleteAccount()
             var retrievedUser = dbManager.getUserByUsername("testUser")
             Assert.assertNull(retrievedUser)
+            dbManager.deleteUser("testuser")
         }
     }
 
@@ -51,6 +52,7 @@ class ProfilePageTest {
             Assert.assertEquals(retrievedUser?.username, testUser.username)
             Assert.assertEquals(testUser.username, "test")
             dbManager.deleteUser("test")
+            dbManager.deleteUser("testuser")
         }
     }
 
