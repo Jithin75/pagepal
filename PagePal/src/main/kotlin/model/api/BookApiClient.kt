@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.example.model.BookModel
+import model.BookModel
 
 
 class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/books/v1/volumes") {
@@ -95,6 +95,3 @@ class BookApiClient(private val baseUrl: String = "https://www.googleapis.com/bo
     }
 }
 
-data class Book(val title: String = "N/A", val authors: String = "N/A", val img: String = "N/A",
-                val publisher: String = "N/A", val publishYear: String = "N/A",
-                val description: String = "N/A", val categories: String = "N/A")

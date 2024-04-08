@@ -5,9 +5,9 @@ import kotlinx.coroutines.runBlocking
 import org.bson.codecs.configuration.CodecRegistries
 import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
-import org.example.model.BookModel
-import org.example.model.DatabaseManager
-import org.example.model.UserModel
+import model.BookModel
+import model.DatabaseManager
+import model.UserModel
 import org.junit.Assert.*
 import org.junit.Test
 

@@ -1,6 +1,5 @@
 package view
 
-import LoginViewState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -13,21 +12,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mongodb.MongoClientSettings
-import com.mongodb.kotlin.client.coroutine.MongoClient
-import kotlinx.coroutines.runBlocking
-import org.bson.codecs.configuration.CodecRegistries
-import org.bson.codecs.configuration.CodecRegistry
-import org.bson.codecs.pojo.PojoCodecProvider
-import org.example.model.DatabaseManager
-import org.example.model.UserModel
 import theme.*
 import viewmodel.SignupViewModel
-import kotlin.math.sign
+
 
 @Composable
 fun SignupView(signupViewModel: SignupViewModel) {
@@ -175,7 +165,6 @@ fun SignupView(signupViewModel: SignupViewModel) {
                         Text(text = "Sign Up")
                     }
                 }
-
             }
         }
     }

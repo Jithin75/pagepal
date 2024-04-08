@@ -24,7 +24,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import model.ImageLoader
-import org.example.viewmodel.MainPageViewModel
+import viewmodel.MainPageViewModel
 import theme.*
 import viewmodel.BookViewModel
 import viewmodel.RecommendationViewModel
@@ -457,7 +457,7 @@ fun editWindow(bookViewModel: BookViewModel, mainPageViewModel: MainPageViewMode
                         Text("DELETE")
                     }
                 }
-                if (bookViewModel.isShowConfirmationDialog()) {
+                if (bookViewModel.showConfirmationDialog) {
                     AlertDialog(
                         onDismissRequest = { bookViewModel.toggleShowConfirmationDialog(false)},
                         title = {

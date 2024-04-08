@@ -5,8 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import model.AIRecommender
 import model.api.BookApiClient
-import org.example.model.BookModel
-import org.example.viewmodel.MainPageViewModel
+import model.BookModel
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -89,5 +88,4 @@ class RecommendationViewModel () {
         isBookOpen = false
         bookOpened = null
     }
-
 }

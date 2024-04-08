@@ -4,9 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.runBlocking
-import org.example.model.DatabaseManager
-import org.example.model.PasswordEncryption
-import org.example.model.UserModel
+import model.DatabaseManager
+import model.PasswordEncryption
+import model.UserModel
 
 class ProfilePageViewModel (val userModel: UserModel, val dbManager: DatabaseManager){
     var currentPassword by mutableStateOf("")
@@ -36,15 +36,6 @@ class ProfilePageViewModel (val userModel: UserModel, val dbManager: DatabaseMan
     }
     fun toggleShowConfirmationDialog(bool : Boolean) {
         showConfirmationDialog = bool
-    }
-    fun isShowPasswordDialog() : Boolean {
-        return showPasswordDialog
-    }
-    fun isShowUsernameChangeDialog() : Boolean {
-        return showUsernameChangeDialog
-    }
-    fun isShowConfirmationDialog() : Boolean {
-        return showConfirmationDialog
     }
     fun toggleCurrentPassword(str: String) {
         currentPassword = str

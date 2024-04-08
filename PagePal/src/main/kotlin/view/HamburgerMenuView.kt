@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import org.example.viewmodel.MainPageViewModel
+import viewmodel.MainPageViewModel
 import theme.grey
 import theme.lightbrown
 import theme.whitevariation
