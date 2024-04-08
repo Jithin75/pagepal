@@ -1,6 +1,6 @@
 import model.api.Book
 import model.api.BookApiClient
-import org.example.model.BookModel
+import model.BookModel
 import org.junit.Test
 
 

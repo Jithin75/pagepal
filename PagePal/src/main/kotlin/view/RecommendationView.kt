@@ -19,9 +19,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.example.model.BookModel
-import org.example.view.BookItem
-import org.example.viewmodel.MainPageViewModel
+import model.BookModel
+import view.BookItem
+import viewmodel.MainPageViewModel
 import theme.darkblue
 import theme.grey
 import theme.lightbrown
@@ -30,74 +30,9 @@ import viewmodel.RecommendationViewModel
 
 @Composable
 fun RecommendationView(mainPageViewModel: MainPageViewModel, recommendationViewModel: RecommendationViewModel) {
-    //var dbManager: DatabaseManager? by remember { mutableStateOf(null) }
-    //var isLoading by remember { mutableStateOf(true) } // State for loading
-    //var displayedBooks by remember { mutableStateOf<List<BookModel>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         recommendationViewModel.initiateDisplayedBooks(mainPageViewModel)
-        /*
-        dbManager = runBlocking {
-            val pojoCodecRegistry: CodecRegistry = CodecRegistries.fromRegistries(
-                MongoClientSettings.getDefaultCodecRegistry(),
-                CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-            )
-            val client =
-                MongoClient.create(connectionString = "mongodb+srv://praviin10:Prav2003@cluster0.fqt7qpj.mongodb.net/?retryWrites=true&w=majority")
-            val database = client.getDatabase("PagePalDB").withCodecRegistry(pojoCodecRegistry)
-            DatabaseManager(database)
-        }
-        try {
-            var userBooks = mainPageViewModel.getUserLibrary()
-
-            val question = StringBuilder()
-            question.append("The user has read the following books: \\n")
-
-            userBooks.forEachIndexed { index, book ->
-                // Append the title and authors to the question string
-                val strippedTitle = book.title.replace("\"", "\\\"")
-                val strippedAuthor = book.author.replace("\"", "\\\"")
-                question.append("$strippedTitle: $strippedAuthor")
-
-                // Append newline character except for the last book
-                if (index < userBooks.size - 1) {
-                    question.append("\\n")
-                }
-            }
-
-            displayedBooks = mutableListOf<BookModel>()
-            // Pass the constructed question string to the getResponse function
-            val response = AIRecommender.getResponse(question.toString(), 10)
-            if (response == "PARSE ERROR") {
-                mainPageViewModel.onDismissRecommend()
-            }
-            val jsonObject = JSONObject(response)
-            val jsonArray: JSONArray = jsonObject.getJSONArray("recommendations")
-            val bookTitles = mutableListOf<String>()
-            for (i in 0 until jsonArray.length()) {
-                val bookObject = jsonArray.getJSONObject(i)
-                val title = bookObject.getString("title")
-                bookTitles.add(title)
-            }
-
-            val bookClient = BookApiClient()
-            val books = mutableListOf<BookModel>()
-
-            for (title in bookTitles) {
-                val book : BookModel = bookClient.searchBook(title)
-                val pattern = Regex("&zoom=\\d+")
-                val replacement = "&zoom=3"
-                val cover = book.cover
-                book.cover = cover.replace(pattern, replacement)
-                books.add(book)
-            }
-
-            displayedBooks = books // Update displayedBooks
-        } catch (e: Exception) {
-            println(e)
-        } finally {
-            isLoading = false // Hide loading screen when tasks complete
-        }*/
     }
 
     MaterialTheme {

@@ -1,18 +1,18 @@
-package org.example.viewmodel
+package viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.runBlocking
-import org.example.model.BookModel
-import org.example.model.DatabaseManager
-import org.example.model.UserModel
+import model.BookModel
+import model.DatabaseManager
+import model.UserModel
 
 
 class MainPageViewModel (val userModel: UserModel,
                          val bookLibrary : MutableList<BookModel>,
-                         val dbManager: DatabaseManager){
-    var displayedBooks by mutableStateOf(bookLibrary.toMutableList())
+                         val dbManager: DatabaseManager) {
+    var displayedBooks by mutableStateOf(bookLibrary)
         private set
 
     var isHamburgerOpen by mutableStateOf(false)
@@ -82,15 +82,6 @@ class MainPageViewModel (val userModel: UserModel,
         }
     }
 
-    /*
-    fun statusFilter(status: String) {
-        if (status == "All") {
-            displayedBooks = bookLibrary.toMutableList()
-        } else {
-            displayedBooks = bookLibrary.filter { it.status.contains(status, ignoreCase = true) }.toMutableList()
-        }
-    }*/
-
     fun filter(sortType: String, status: String, searchValue: String) {
         displayedBooks = when(sortType) {
             "Title" -> bookLibrary.sortedBy { it.title }.toMutableList()
@@ -121,15 +112,6 @@ class MainPageViewModel (val userModel: UserModel,
         bookLibrary.add(book)
         displayedBooks.add(book)
     }
-
-    /*
-    fun searchResults(searchValue: String) {
-        if (searchValue.isNotBlank()) {
-            displayedBooks = bookLibrary.filter { it.title.contains(searchValue, ignoreCase = true) }.toMutableList()
-        } else {
-            displayedBooks = bookLibrary.toMutableList() // Reset to original bookLibrary if search is empty
-        }
-    }*/
 
     fun refreshDisplay() {
         displayedBooks = bookLibrary.toMutableList()

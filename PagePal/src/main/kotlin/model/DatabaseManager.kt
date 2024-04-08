@@ -1,4 +1,4 @@
-package org.example.model
+package model
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Updates
@@ -141,17 +141,4 @@ class DatabaseManager(private val database: MongoDatabase) {
         val result = userCollection.updateOne(filter, update)
         println("Updated ${result.modifiedCount} document(s)")
     }
-
-    // Clean up functions for personal testing
-    /*
-    suspend fun clearBookCollection() {
-        val result = bookCollection.deleteMany(BsonDocument()) // Delete all documents from the BookCollection
-        println("Deleted ${result.deletedCount} documents from BookCollection")
-    }
-
-    suspend fun clearUserCollection() {
-        val result = userCollection.deleteMany(BsonDocument()) // Delete all documents from the UserCollection
-        println("Deleted ${result.deletedCount} documents from UserCollection")
-    }*/
-
 }

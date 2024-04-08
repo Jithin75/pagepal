@@ -1,4 +1,4 @@
-package org.example.model
+package model
 
 data class BookModel (
     val title: String,

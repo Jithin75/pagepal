@@ -1,11 +1,8 @@
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
@@ -17,17 +14,16 @@ import org.bson.codecs.configuration.CodecRegistries.fromProviders
 import org.bson.codecs.configuration.CodecRegistries.fromRegistries
 import org.bson.codecs.configuration.CodecRegistry
 import org.bson.codecs.pojo.PojoCodecProvider
-import org.example.model.BookModel
-import org.example.model.DatabaseManager
-import org.example.model.UserModel
-import org.example.view.MainPageView
-import org.example.viewmodel.MainPageViewModel
+import model.BookModel
+import model.DatabaseManager
+import model.UserModel
+import view.MainPageView
+import viewmodel.MainPageViewModel
 import view.LoginView
 import view.SignupView
 import viewmodel.LoginViewModel
 import viewmodel.SignupViewModel
 import java.awt.Dimension
-import kotlin.math.sign
 
 data class LoginViewState(val login: UserModel?, val view: String)
 
@@ -58,8 +54,6 @@ fun App() {
     }
 }
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 fun main() = application {
 
     Window(

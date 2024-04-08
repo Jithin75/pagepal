@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,15 +25,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.runBlocking
-import org.example.model.PasswordEncryption
-import org.example.viewmodel.MainPageViewModel
+import model.PasswordEncryption
+import viewmodel.MainPageViewModel
 import theme.darkblue
 import theme.grey
 import theme.lightbrown
 import theme.whitevariation
 import viewmodel.ProfilePageViewModel
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: ProfilePageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     val qualityList : List<String> = listOf("Low", "Medium", "High")
@@ -250,7 +248,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                 }
             }
         )
-        if (profilePageViewModel.isShowConfirmationDialog()) {
+        if (profilePageViewModel.showConfirmationDialog) {
             AlertDialog(
                 onDismissRequest = { profilePageViewModel.toggleShowConfirmationDialog(false)},
                 title = {
@@ -287,7 +285,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                 backgroundColor = darkblue
             )
         }
-        if (profilePageViewModel.isShowUsernameChangeDialog()) {
+        if (profilePageViewModel.showUsernameChangeDialog) {
             AlertDialog(
                 onDismissRequest = { profilePageViewModel.toggleShowUsernameChangeDialog(false) },
                 text = {
@@ -356,7 +354,7 @@ fun ProfilePageView(mainPageViewModel: MainPageViewModel, profilePageViewModel: 
                 backgroundColor = darkblue
             )
         }
-        if (profilePageViewModel.isShowPasswordDialog()) {
+        if (profilePageViewModel.showPasswordDialog) {
             AlertDialog(
                 onDismissRequest = { profilePageViewModel.toggleShowPasswordDialog(false) },
                 text = {

@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.runBlocking
-import org.example.model.DatabaseManager
+import model.DatabaseManager
 
 class LoginViewModel (val setCurrentState: (LoginViewState) -> Unit, val dbManager: DatabaseManager) {
     var username by mutableStateOf("")

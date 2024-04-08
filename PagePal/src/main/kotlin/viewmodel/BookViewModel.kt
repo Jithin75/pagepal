@@ -4,14 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.runBlocking
-import org.example.model.BookModel
-import org.example.model.DatabaseManager
+import model.BookModel
+import model.DatabaseManager
 
 class BookViewModel (val bookModel: BookModel, val dbManager: DatabaseManager){
     var isEditOpen by mutableStateOf(false)
         private set
 
     var showConfirmationDialog by mutableStateOf(false)
+        private set
 
     var isAddOpen by mutableStateOf(false)
         private set
@@ -89,8 +90,5 @@ class BookViewModel (val bookModel: BookModel, val dbManager: DatabaseManager){
     }
     fun toggleShowConfirmationDialog(bool : Boolean) {
         showConfirmationDialog = bool
-    }
-    fun isShowConfirmationDialog() : Boolean {
-        return showConfirmationDialog
     }
 }

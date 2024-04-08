@@ -1,4 +1,4 @@
-package org.example.view
+package view
 
 import LoginViewState
 import androidx.compose.foundation.*
@@ -43,8 +43,8 @@ import androidx.compose.ui.zIndex
 import model.ImageLoader
 import model.api.Book
 import model.api.BookApiClient
-import org.example.model.BookModel
-import org.example.viewmodel.MainPageViewModel
+import model.BookModel
+import viewmodel.MainPageViewModel
 import theme.*
 import view.BookView
 import view.HamburgerMenuView
@@ -56,13 +56,10 @@ import viewmodel.BookViewModel
 fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginViewState) -> Unit) {
     val sortOptions =  listOf("Default","Title", "Author", "Recently Added")
     val statusOptions = listOf("All","New", "In Progress", "Completed")
-
     var sortExpanded by remember { mutableStateOf(false) }
     var sortSelectedOptionText by remember { mutableStateOf(sortOptions[0])}
-
     var statusExpanded by remember { mutableStateOf(false) }
     var statusSelectedOptionText by remember { mutableStateOf(statusOptions[0])}
-
     var searchContent by remember {mutableStateOf("")}
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -174,21 +171,6 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
                                     .weight(1.2f)
                                     .focusRequester(searchFocusRequester)
                             )
-                            /*
-                            SearchBar(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterVertically)
-                                    .weight(1.2f),
-                                mainPageViewModel
-                            )*/
-                            /*
-                            DropDown(
-                                listOf("Genre", "Horror", "Fantasy", "SciFi"),
-                                Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterVertically)
-                            ) {}*/
                             Box(
                                 contentAlignment = Alignment.CenterStart,
                                 modifier = Modifier
@@ -327,79 +309,6 @@ fun MainPageView(mainPageViewModel: MainPageViewModel, setCurrentState: (LoginVi
     }
 }
 
-/*
-@Composable
-fun SearchBar(modifier: Modifier, mainPageViewModel: MainPageViewModel){
-    var searchContent by remember {mutableStateOf("")}
-    TextField(
-        value = searchContent,
-        onValueChange = {
-            searchContent = it
-            mainPageViewModel.searchResults(it)},
-        leadingIcon = { Icon(
-            Icons.Filled.Search,
-            contentDescription = "searchIcon",
-        )},
-        placeholder = {Text("Search")},
-        modifier = modifier
-            .width(320.dp)
-            .height(50.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = whitevariation,
-            leadingIconColor = Color.Black,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            placeholderColor = lightgrey,
-            cursorColor = Color.Black,
-        ),
-        singleLine = true
-    )
-}
-
-@Composable
-fun DropDown(options: List<String>, modifier: Modifier, onClick: (String) -> Unit){
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(options[0])}
-
-    Box(
-        contentAlignment = Alignment.CenterStart,
-        modifier = modifier
-            .size(192.dp, 50.dp)
-            .clip(RoundedCornerShape(1.dp))
-            .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
-            .clickable { expanded = !expanded },
-    ) {
-        Text(
-            text = selectedOptionText,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(start = 10.dp),
-            color = lightgrey
-        )
-        Icon(
-            Icons.Filled.ArrowDropDown,
-            "contentDescription",
-            Modifier.align(Alignment.CenterEnd),
-            tint = lightgrey
-        )
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { selectionOption ->
-                DropdownMenuItem(
-                    onClick = {
-                        selectedOptionText = selectionOption
-                        expanded = false
-                    }
-                ) {
-                    Text(text = selectionOption)
-                }
-            }
-        }
-    }
-}*/
-
 @Composable
 fun BookItem(book: BookModel, onClick: () -> Unit) {
     val imageLoader = ImageLoader()
@@ -462,7 +371,6 @@ fun BookItem(book: BookModel, onClick: () -> Unit) {
 
 @Composable
 fun addBookWindow(mainPageViewModel: MainPageViewModel) {
-
     var searchQuery by remember { mutableStateOf("") }
     var selectedBook by remember { mutableStateOf<Book?>(null) }
     var selectedStatus by remember { mutableStateOf("New") }
@@ -471,10 +379,7 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
     var page by remember { mutableStateOf("1") }
     var bookModel by remember { mutableStateOf<BookModel?>(null)}
     val imageLoader = ImageLoader()
-    //var statusExpanded by remember { mutableStateOf(false) }
-
     val statusList : List<String> = listOf("New", "In Progress", "Completed")
-
     val bookApiClient = BookApiClient()
 
     Popup(
@@ -736,23 +641,6 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                     OutlinedButton(
                         onClick = {
                             if (bookModel != null) {
-                                /*
-                                val bookInfo = selectedBook
-                                val pattern = Regex("&zoom=\\d+")
-                                val replacement = "&zoom=3"
-                                var cover = bookInfo!!.img
-                                cover = cover.replace(pattern, replacement)
-                                val book = BookModel(
-                                    title = bookInfo.title,
-                                    author = bookInfo.authors,
-                                    cover = cover,
-                                    publisher = bookInfo.publisher,
-                                    publishYear = bookInfo.publishYear,
-                                    description = bookInfo.description,
-                                    categories = bookInfo.categories,
-                                    status = selectedStatus,
-                                    chapter = chapter,
-                                    page = page)*/
                                 if(bookModel!!.newBook(mainPageViewModel.bookLibrary)) {
                                     bookModel!!.status = selectedStatus
                                     bookModel!!.chapter = chapter
@@ -807,157 +695,8 @@ fun addBookWindow(mainPageViewModel: MainPageViewModel) {
                         )
                     }
                 }
-                /*
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(192.dp, 50.dp)
-                        .clip(RoundedCornerShape(1.dp))
-                        .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
-                        .clickable { statusExpanded = !statusExpanded },
-                ) {
-                    Text(
-                        text = selectedStatus.value,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp),
-                        color = lightgrey
-                    )
-                    Icon(
-                        Icons.Filled.ArrowDropDown,
-                        "contentDescription",
-                        Modifier.align(Alignment.CenterEnd),
-                        tint = lightgrey
-                    )
-                    DropdownMenu(
-                        expanded = statusExpanded,
-                        onDismissRequest = { statusExpanded = false }
-                    ) {
-                        statusOptions.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    selectedStatus.value = selectionOption
-                                    statusExpanded = false
-                                }
-                            ) {
-                                Text(text = selectionOption)
-                            }
-                        }
-                    }
-                }*/
             }
         }
     )
-    /*
-    AlertDialog(
-        onDismissRequest = {
-            searchQuery.value = ""
-            selectedBook.value = null
-            selectedStatus.value = ""
-            bookResults.value = emptyList()
-            mainPageViewModel.onDismissAddBook()
-        },
-        title = { Text("Search") },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 68.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                TextField(
-                    value = searchQuery.value,
-                    onValueChange = { searchQuery.value = it },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Search
-                    )
-                )
-                Button(
-                    onClick = {
-                        // Call API with searchText and populate searchResults
-                        // This is a placeholder, replace it with your actual API call
-                        bookResults.value = bookApiClient.searchBooks(searchQuery.value)
-                    }
-                ) {
-                    Text("Search")
-                }
-                DropdownMenu(
-                    expanded = bookResults.value.isNotEmpty(),
-                    onDismissRequest = {
-                        bookResults.value = emptyList()
-                    },
-                    modifier = Modifier.width(IntrinsicSize.Min)
-                ) {
-                    // Populate the dropdown menu with search results
-                    bookResults.value.forEach { result ->
-                        Text(result.title, modifier = Modifier.clickable {
-                            // Handle selection of search result here
-                            // For example, close popup and show details in a new window
-                            selectedBook.value = result
-                            searchQuery.value = result.title
-                            bookResults.value = emptyList()
-                        })
-                    }
-                }
-                Box(
-                    contentAlignment = Alignment.CenterStart,
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .size(192.dp, 50.dp)
-                        .clip(RoundedCornerShape(1.dp))
-                        .border(BorderStroke(1.dp, lightgrey), RoundedCornerShape(4.dp))
-                        .clickable { statusExpanded = !statusExpanded },
-                ) {
-                    Text(
-                        text = selectedStatus.value,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp),
-                        color = lightgrey
-                    )
-                    Icon(
-                        Icons.Filled.ArrowDropDown,
-                        "contentDescription",
-                        Modifier.align(Alignment.CenterEnd),
-                        tint = lightgrey
-                    )
-                    DropdownMenu(
-                        expanded = statusExpanded,
-                        onDismissRequest = { statusExpanded = false }
-                    ) {
-                        statusOptions.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    selectedStatus.value = selectionOption
-                                    statusExpanded = false
-                                }
-                            ) {
-                                Text(text = selectionOption)
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            Button(onClick = {
-                if (selectedBook.value != null && selectedStatus.value != "Status") {
-                    val bookInfo = selectedBook.value
-                    val status = selectedStatus.value
-                    val book = BookModel(bookInfo!!.title, bookInfo.authors, bookInfo.img,
-                        bookInfo.publisher, bookInfo.publishYear, bookInfo.description, bookInfo.categories, status)
-                    mainPageViewModel.addBook(book)
-                    searchQuery.value = ""
-                    selectedBook.value = null
-                    selectedStatus.value = ""
-                    bookResults.value = emptyList()
-                    mainPageViewModel.onDismissAddBook()
-                }
-            },
-//                enabled = selectedBook.value != null /*&& selectedStatus.value.isNotEmpty()*/
-            ) {
-                Text("Add")
-            }
-        }
-    ) */
 }
 
