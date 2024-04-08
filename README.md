@@ -45,3 +45,7 @@ We believe that we were able to achieve the following advanced features:
 ### Development Journal
 
 [Development Journal](../../wikis/Development-Journal)
+
+### Reflections
+
+[Reflections](../../wikis/Reflections)
