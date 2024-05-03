@@ -1,5 +1,3 @@
-# Team-102-5
-
 ## PagePal Your Ultimate Reading Companion
 
 ### This repository has only the code and has been cloned for completeness of my profile, the actual repositary with working links to wiki pages for the documentations and release notes is: https://git.uwaterloo.ca/jjothikr/pagepal
