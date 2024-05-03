@@ -10,7 +10,7 @@ Welcome to PagePal – the all-in-one application designed to transform your rea
 
 With PagePal, you can track your reading progress, manage your book collection, receive AI-powered personalized book recommendations, and set reading goals. Our goal is to create a cohesive and satisfying reading experience for our users, making reading more accessible and enjoyable for everyone.
 
-### NOTE: The support for the AI-powered reccomendation will stop after May 16th since the API key that we use will expire and the OPEN AI plan does not offer any more free packages. Thank You for understanding!
+### NOTE: The support for the AI-powered reccomendation will stop after May 16th 2024, since the API key that we use will expire and the OPEN AI plan does not offer any more free packages. Thank You for understanding!
 
 ### Advanced Features:
 
